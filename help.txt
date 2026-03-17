@@ -1,0 +1,83 @@
+accounting-Engine
+│
+├── src
+│
+│   ├── modules
+│   │
+│   │   ├── auth
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.service.ts
+│   │   │   ├── auth.routes.ts
+│   │   │   └── auth.validation.ts
+│   │   │
+│   │   ├── companies
+│   │   │   ├── company.model.ts
+│   │   │   ├── company.service.ts
+│   │   │   ├── company.controller.ts
+│   │   │   ├── company.routes.ts
+│   │   │   └── company.validation.ts
+│   │   │
+│   │   ├── accounts
+│   │   │   ├── account.model.ts
+│   │   │   ├── account.service.ts
+│   │   │   ├── account.controller.ts
+│   │   │   ├── account.routes.ts
+│   │   │   └── account.validation.ts
+│   │   │
+│   │   ├── journal
+│   │   │   ├── journal.model.ts
+│   │   │   ├── journal.service.ts
+│   │   │   ├── journal.controller.ts
+│   │   │   ├── journal.routes.ts
+│   │   │   └── journal.validation.ts
+│   │   │
+│   │   ├── transactions
+│   │   │   ├── transaction.model.ts
+│   │   │   ├── transaction.service.ts
+│   │   │   ├── transaction.controller.ts
+│   │   │   ├── transaction.routes.ts
+│   │   │   └── transaction.validation.ts
+│   │   │
+│   │   ├── invoices
+│   │   │   ├── invoice.model.ts
+│   │   │   ├── invoice.service.ts
+│   │   │   ├── invoice.controller.ts
+│   │   │   ├── invoice.routes.ts
+│   │   │   └── invoice.validation.ts
+│   │   │
+│   │   ├── reports
+│   │   │   ├── report.service.ts
+│   │   │   └── report.controller.ts
+│   │   │
+│   │   └── audit
+│   │       ├── audit.service.ts
+│   │       └── audit.middleware.ts
+│
+│   ├── middlewares
+│   │   ├── auth.middleware.ts
+│   │   ├── role.middleware.ts
+│   │   ├── error.middleware.ts
+│   │   └── validation.middleware.ts
+│
+│   ├── utils
+│   │   ├── jwt.ts
+│   │   ├── hashing.ts
+│   │   ├── logger.ts
+│   │   └── helpers.ts
+│
+│   ├── config
+│   │   ├── prisma.ts
+│   │   └── env.ts
+│
+│   ├── app.ts
+│   └── server.ts
+│
+├── prisma
+│   ├── schema.prisma
+│   └── seed.ts
+│
+├── tests
+│
+├── docker
+├── .env
+└── package.json

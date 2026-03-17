@@ -1,0 +1,147 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum Role {
+  ADMIN
+  USER
+  COMPANY
+}
+
+enum EntryStatus {
+  DRAFT
+  POSTED
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  users     User[]
+  accounts  Account[]
+  entries   JournalEntry[]
+  customers Customer[]
+  vendors   Vendor[]
+  invoices  Invoice[]
+  payments  Payment[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role   @default(COMPANY)
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
+  entries   JournalEntry[]
+}
+
+model Account {
+  id        String      @id @default(uuid())
+  name      String
+  code      String
+  type      AccountType
+  currency  String
+  createdAt DateTime    @default(now())
+  deletedAt DateTime?
+  company   Company     @relation(fields: [companyId], references: [id])
+  companyId String
+  parent    Account?    @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children  Account[]   @relation("AccountHierarchy")
+  parentId  String?
+  transactions Transaction[]
+}
+
+model JournalEntry {
+  id          String      @id @default(uuid())
+  description String
+  date        DateTime    @default(now())
+  status      EntryStatus @default(DRAFT)
+  referenceId String?
+  referenceType String?
+  createdAt   DateTime    @default(now())
+  deletedAt   DateTime?
+  company     Company     @relation(fields: [companyId], references: [id])
+  companyId   String
+  createdBy   User        @relation(fields: [userId], references: [id])
+  userId      String
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  debit     Float    @default(0)
+  credit    Float    @default(0)
+  type      String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  journal   JournalEntry @relation(fields: [journalId], references: [id])
+  journalId String
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
+  invoices  Invoice[]
+}
+
+model Vendor {
+  id        String   @id @default(uuid())
+  name      String
+  contact   String?
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
+}
+
+model Invoice {
+  id           String   @id @default(uuid())
+  total        Float
+  status       String
+  issuedAt     DateTime @default(now())
+  deletedAt    DateTime?
+  customer     Customer @relation(fields: [customerId], references: [id])
+  customerId   String
+  company      Company  @relation(fields: [companyId], references: [id])
+  companyId    String
+  payments     Payment[]
+}
+
+model Payment {
+  id         String   @id @default(uuid())
+  amount     Float
+  method     String
+  createdAt  DateTime @default(now())
+  deletedAt  DateTime?
+  invoice    Invoice? @relation(fields: [invoiceId], references: [id])
+  invoiceId  String?
+  company    Company  @relation(fields: [companyId], references: [id])
+  companyId  String
+}
