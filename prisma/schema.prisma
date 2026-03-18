@@ -19,9 +19,9 @@ enum AccountType {
 }
 
 enum Role {
-  ADMIN
+  SUPER_ADMIN
+  COMPANY_ADMIN
   USER
-  COMPANY
 }
 
 enum EntryStatus {
@@ -43,15 +43,16 @@ model Company {
   payments  Payment[]
 }
 
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
-  role      Role   @default(COMPANY)
+  role      Role
   createdAt DateTime @default(now())
   deletedAt DateTime?
-  company   Company  @relation(fields: [companyId], references: [id])
-  companyId String
+  company   Company?  @relation(fields: [companyId], references: [id])
+  companyId String?
   entries   JournalEntry[]
 }
 
