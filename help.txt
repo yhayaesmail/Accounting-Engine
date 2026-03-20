@@ -31,12 +31,6 @@ accounting-Engine
 │   │   │   ├── journal.routes.ts
 │   │   │   └── journal.validation.ts
 │   │   │
-│   │   ├── transactions
-│   │   │   ├── transaction.model.ts
-│   │   │   ├── transaction.service.ts
-│   │   │   ├── transaction.controller.ts
-│   │   │   ├── transaction.routes.ts
-│   │   │   └── transaction.validation.ts
 │   │   │
 │   │   ├── invoices
 │   │   │   ├── invoice.model.ts
