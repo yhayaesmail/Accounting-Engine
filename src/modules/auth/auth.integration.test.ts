@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { register,login,logout,refreshToken } from "../auth/auth.service";
-import prisma from "../../config/prisma";
-import { redis } from "../../config/redis";
+import { register,login,logout,refreshToken } from "./auth.service.js";
+import prisma from "../../config/prisma.js";
+import { redis } from "../../config/redis.js";
 
 beforeEach(async () => {
   await prisma.user.deleteMany();
