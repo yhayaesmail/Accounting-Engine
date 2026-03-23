@@ -1,3 +1,27 @@
+// 1. Create Journal Entry
+createJournalEntry(data)
+
+// 2. Get All Journal Entries (with filters + pagination)
+getJournalEntries(filters)
+
+// 3. Get Single Journal Entry
+getJournalEntryById(id)
+
+// 4. Update Journal Entry (or prevent update after posting)
+updateJournalEntry(id, data)
+
+// 5. Delete Journal Entry (soft delete or restricted)
+deleteJournalEntry(id)
+
+// 6. Post Journal Entry (IMPORTANT)
+postJournalEntry(id)
+
+// 7. Reverse Journal Entry (professional level)
+reverseJournalEntry(id)
+
+
+
+
 accounting-Engine
 │
 ├── src
