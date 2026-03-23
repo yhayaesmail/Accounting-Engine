@@ -16,8 +16,6 @@ deleteJournalEntry(id)
 // 6. Post Journal Entry (IMPORTANT)
 postJournalEntry(id)
 
-// 7. Reverse Journal Entry (professional level)
-reverseJournalEntry(id)
 
 
 
