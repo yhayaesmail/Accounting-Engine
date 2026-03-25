@@ -115,7 +115,6 @@ export const login = async (data: LoginInput) => {
       await redis.expire(rateKey, 60);
       throw new UnauthorizedError();
     }
-
     await redis.del(rateKey);
     const accessToken = generateAccessToken({
       userId: user.id,

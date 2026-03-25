@@ -1,12 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import { UnauthorizedError } from "../utils/errors.js";
+import { Response, NextFunction } from "express";
+import { AuthRequest } from "../types/auth.types.js";
+import { ForbiddenError } from "../utils/errors.js";
 
 export const allowRoles = (...roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user;
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    const user = req.user;
     if (!user || !roles.includes(user.role)) {
-      return next(new UnauthorizedError("Forbidden"));
+      return next(new ForbiddenError("Access denied"));
     }
+
     next();
   };
 };
