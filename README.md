@@ -17,6 +17,7 @@ Backend accounting system built with Node.js, TypeScript, Prisma, and Redis.
 - PostgreSQL
 - Redis
 - Vitest
+- Docker
 
 ## Setup
 
