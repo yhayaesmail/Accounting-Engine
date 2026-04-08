@@ -29,8 +29,8 @@ export const createJournalEntry = async (data: CreateJournalEntryInput) => {
     if (t.credit && t.credit < 0) {
       throw new BadRequestError("Credit cannot be negative");
     }
-    totalDebit += t.debit || 0;
-    totalCredit += t.credit || 0;
+    totalDebit += t.debit ?? 0;
+    totalCredit += t.credit ?? 0;
   }
   if (totalDebit !== totalCredit) {
     logger.warn("Debit and Credit totals do not match", { totalDebit, totalCredit, companyId });
@@ -45,7 +45,6 @@ export const createJournalEntry = async (data: CreateJournalEntryInput) => {
           companyId,
         },
       });
-
       if (accounts.length !== accountIds.length) {
         logger.warn("Some accounts not found or unauthorized", { accountIds, companyId });
         throw new BadRequestError("Invalid or unauthorized account");
@@ -73,7 +72,6 @@ export const createJournalEntry = async (data: CreateJournalEntryInput) => {
       logger.info("Journal Entry Created", { entryId: createdEntry.id, companyId, userId });
       return createdEntry;
     });
-
     return entry;
   } catch (error) {
     logger.error("Create Journal Entry Failed", { error });
@@ -98,9 +96,6 @@ export const getAllJournalEntries = async (
   const totalEntries = await prisma.journalEntry.count({
     where: { companyId },
   });
-  if (totalEntries === 0) {
-    throw new BadRequestError("No journal entries found for this company");
-  }
   const entries = await prisma.journalEntry.findMany({
     where: { companyId ,deletedAt: null},
     include: {
@@ -112,7 +107,6 @@ export const getAllJournalEntries = async (
     skip,
     take: limit,
   });
-
   logger.info("Journal entry fetched", {
   companyId,
   });
@@ -145,7 +139,7 @@ export const getJournalEntryById = async (id: string, companyId: string) => {
   if (!companyId) {
     throw new BadRequestError("Company ID is required");
   }
-  const entry = await prisma.journalEntry.findUnique({
+  const entry = await prisma.journalEntry.findFirst({
     where: {
       id,
       companyId,
@@ -162,7 +156,6 @@ export const getJournalEntryById = async (id: string, companyId: string) => {
     entryId: id,
     companyId,
   });
-
   return entry;
   } catch (error) {
     logger.error("Get Journal Entry Failed", {
@@ -224,11 +217,9 @@ export const postJournalEntry = async (id: string, companyId: string) => {
     if (!id) {
       throw new BadRequestError("Journal entry ID is required");
     }
-
     if (!companyId) {
       throw new BadRequestError("Company ID is required");
     }
-
     const entry = await prisma.journalEntry.findFirst({
       where: {
         id,
@@ -239,27 +230,21 @@ export const postJournalEntry = async (id: string, companyId: string) => {
         transactions: true,
       },
     });
-
     if (!entry) {
       throw new NotFoundError("Journal entry not found");
     }
-
     if (entry.status === "POSTED") {
       throw new ConflictError("Journal entry already posted");
     }
-
     let totalDebit = 0;
     let totalCredit = 0;
-
     for (const t of entry.transactions) {
       totalDebit += t.debit;
       totalCredit += t.credit;
     }
-
     if (totalDebit !== totalCredit) {
       throw new ConflictError("Debit and credit must be equal");
     }
-
     const updatedEntry = await prisma.journalEntry.update({
       where: {
         id,
@@ -268,12 +253,10 @@ export const postJournalEntry = async (id: string, companyId: string) => {
         status: "POSTED",
       },
     });
-
     logger.info("Journal entry posted", {
       entryId: id,
       companyId,
     });
-
     return updatedEntry;
   } catch (error) {
     logger.error("Post Journal Entry Failed", {
@@ -284,6 +267,3 @@ export const postJournalEntry = async (id: string, companyId: string) => {
     throw error;
   }
 };
-
-
-

@@ -23,11 +23,11 @@ vi.mock("../../config/prisma", () => ({
   },
 }));
 
+
 describe("journal service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
   const validData = {
     date: new Date(),
     description: "Test Entry",
@@ -38,6 +38,8 @@ describe("journal service", () => {
       { accountId: "acc-2", credit: 100 },
     ],
   };
+
+
 
   describe("createJournalEntry", () => {
     it("should create journal entry successfully", async () => {
@@ -54,13 +56,10 @@ describe("journal service", () => {
           },
         });
       });
-
       const result = await createJournalEntry(validData);
-
       expect(result).toBeDefined();
       expect(prisma.$transaction).toHaveBeenCalled();
     });
-
     it("should throw if less than 2 transactions", async () => {
       await expect(
         createJournalEntry({
@@ -69,7 +68,6 @@ describe("journal service", () => {
         })
       ).rejects.toThrow();
     });
-
     it("should throw if debit not equal credit", async () => {
       await expect(
         createJournalEntry({
@@ -81,7 +79,6 @@ describe("journal service", () => {
         })
       ).rejects.toThrow();
     });
-
     it("should throw if transaction has both debit and credit", async () => {
       await expect(
         createJournalEntry({
@@ -95,59 +92,54 @@ describe("journal service", () => {
     });
   });
 
-  describe("getAllJournalEntries", () => {
-    it("should return paginated entries", async () => {
-      (prisma.journalEntry.count as any).mockResolvedValue(1);
-      (prisma.journalEntry.findMany as any).mockResolvedValue([{ id: "1" }]);
 
-      const result = await getAllJournalEntries("company-1", 1, 10);
 
-      expect(result.data).toBeDefined();
-      expect(result.pagination.totalEntries).toBe(1);
-    });
+describe("getAllJournalEntries", () => {
+  it("should return paginated entries", async () => {
+    (prisma.journalEntry.count as any).mockResolvedValue(1);
+    (prisma.journalEntry.findMany as any).mockResolvedValue([{ id: "1" }]);
 
-    it("should throw if no entries", async () => {
-      (prisma.journalEntry.count as any).mockResolvedValue(0);
+    const result = await getAllJournalEntries("company-1", 1, 10);
 
-      await expect(
-        getAllJournalEntries("company-1", 1, 10)
-      ).rejects.toThrow();
-    });
+    expect(result.data).toBeDefined();
+    expect(result.pagination.totalEntries).toBe(1);
   });
+  it("should return empty array if no entries", async () => {
+    (prisma.journalEntry.count as any).mockResolvedValue(0);
+    (prisma.journalEntry.findMany as any).mockResolvedValue([]);
+    const result = await getAllJournalEntries("company-1", 1, 10);
+    expect(result.data).toEqual([]);
+    expect(result.pagination.totalEntries).toBe(0);
+  });
+});
 
   describe("getJournalEntryById", () => {
     it("should return entry", async () => {
-      (prisma.journalEntry.findUnique as any).mockResolvedValue({
+      (prisma.journalEntry.findFirst as any).mockResolvedValue({
         id: "1",
+        companyId:"company-1",
       });
-
       const result = await getJournalEntryById("1", "company-1");
-
       expect(result).toBeDefined();
     });
-
     it("should throw if not found", async () => {
-      (prisma.journalEntry.findUnique as any).mockResolvedValue(null);
-
+      (prisma.journalEntry.findFirst as any).mockResolvedValue(null);
       await expect(
         getJournalEntryById("1", "company-1")
       ).rejects.toThrow();
     });
   });
 
+
   describe("deleteJournalEntry", () => {
     it("should soft delete entry", async () => {
       (prisma.journalEntry.findFirst as any).mockResolvedValue({ id: "1" });
       (prisma.journalEntry.update as any).mockResolvedValue({ id: "1" });
-
       const result = await deleteJournalEntry("1", "company-1");
-
       expect(result).toBeDefined();
     });
-
     it("should throw if not found", async () => {
       (prisma.journalEntry.findFirst as any).mockResolvedValue(null);
-
       await expect(
         deleteJournalEntry("1", "company-1")
       ).rejects.toThrow();
