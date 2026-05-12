@@ -1,18 +1,24 @@
 {
   "name": "accounting-engine",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A full-stack accounting dashboard built with Node.js, TypeScript, Prisma, PostgreSQL, Redis, and vanilla frontend.",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch ./src/server.ts",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "npm run clean && prisma generate && tsc",
     "test": "vitest --run",
-    "start": "node ./src/server.js",
+    "start": "prisma migrate deploy && node ./dist/server.js",
+    "start:local": "tsx ./src/server.ts",
     "seed": "tsx ./src/seed/seed.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",

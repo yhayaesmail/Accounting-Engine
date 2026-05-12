@@ -168,6 +168,28 @@ Run tests:
 npm run test
 ```
 
+Build for production:
+
+```bash
+npm run build
+```
+
+Start production server:
+
+```bash
+npm start
+```
+
+## Deployment
+
+The project can be deployed for free using Render, Supabase, and Upstash:
+
+- Render hosts the Node.js web service and serves the frontend.
+- Supabase provides the PostgreSQL database.
+- Upstash provides Redis for sessions and rate limiting.
+
+Full deployment steps are available in [DEPLOYMENT.md](./DEPLOYMENT.md).
+
 ## Frontend
 
 The frontend is intentionally built with vanilla HTML, CSS, and JavaScript. It includes:
