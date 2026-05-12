@@ -49,9 +49,7 @@ Accounting Engine solves this by introducing a modular backend around real accou
 - PostgreSQL
 - Redis
 - Vitest
-- HTML
-- CSS
-- Vanilla JavaScript
+- Docker
 
 ## Architecture
 
