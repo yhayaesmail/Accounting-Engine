@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthRequest } from "../../middlewares/auth.middleware.js";
+import { AuthRequest } from "../../types/auth.types.js";
 import * as authService from "./auth.service.js";
 
 export const registerController = async (

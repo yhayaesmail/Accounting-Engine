@@ -4,6 +4,13 @@ import prisma from "../../config/prisma.js";
 import { redis } from "../../config/redis.js";
 
 beforeEach(async () => {
+  await prisma.payment.deleteMany();
+  await prisma.invoice.deleteMany();
+  await prisma.transaction.deleteMany();
+  await prisma.journalEntry.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.customer.deleteMany();
+  await prisma.vendor.deleteMany();
   await prisma.user.deleteMany();
   await prisma.company.deleteMany();
   await redis.flushall();

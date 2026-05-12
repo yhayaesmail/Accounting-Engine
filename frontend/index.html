@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finance Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section id="authSection" class="auth-layout">
+        <button class="theme-toggle auth-theme" type="button" data-theme-toggle>
+          <span data-theme-icon>Dark</span>
+        </button>
+        <div class="auth-brand">
+          <div class="brand-mark">FD</div>
+          <p class="eyebrow">Finance Dashboard</p>
+          <h1>Modern accounting workspace for growing teams.</h1>
+          <p class="lead">Track accounts, customers, invoices, payments and journal entries through one clean dashboard connected to your backend.</p>
+          <div class="preview-card">
+            <div class="preview-top">
+              <span>Monthly Overview</span>
+              <strong>$48,240</strong>
+            </div>
+            <div class="chart-bars">
+              <span style="height: 46%"></span>
+              <span style="height: 68%"></span>
+              <span style="height: 38%"></span>
+              <span style="height: 82%"></span>
+              <span style="height: 58%"></span>
+              <span style="height: 94%"></span>
+            </div>
+            <div class="preview-meta">
+              <span>Invoices</span>
+              <span>Payments</span>
+              <span>Reports</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-panel">
+          <div class="auth-tabs">
+            <button class="tab-btn active" data-auth-tab="login">Login</button>
+            <button class="tab-btn" data-auth-tab="register">Register</button>
+          </div>
+
+          <form id="loginForm" class="auth-form">
+            <div class="section-heading">
+              <span>Welcome back</span>
+              <h2>Sign in to dashboard</h2>
+            </div>
+            <label>Email<input name="email" type="email" placeholder="admin@company.com" required /></label>
+            <label>Password<input name="password" type="password" placeholder="Enter password" required /></label>
+            <button type="submit" class="primary-btn">Login</button>
+          </form>
+
+          <form id="registerForm" class="auth-form hidden">
+            <div class="section-heading">
+              <span>New company</span>
+              <h2>Create workspace</h2>
+            </div>
+            <label>Company Name<input name="companyName" placeholder="Company name" required /></label>
+            <label>Admin Email<input name="email" type="email" placeholder="admin@company.com" required /></label>
+            <label>Password<input name="password" type="password" placeholder="Minimum 8 characters" required /></label>
+            <button type="submit" class="primary-btn">Create account</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="appSection" class="app-layout hidden">
+        <aside class="sidebar">
+          <div class="sidebar-brand">
+            <div class="brand-mark small" id="companyInitials">CO</div>
+            <div>
+              <strong id="companyNameSidebar">Company</strong>
+              <span>Finance workspace</span>
+            </div>
+          </div>
+          <nav class="nav-list">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#accounts">Accounts</a>
+            <a href="#sales">Sales</a>
+            <a href="#journal">Journal</a>
+            <a href="#reports">Reports</a>
+          </nav>
+          <div class="sidebar-footer">
+            <span id="sessionText">Not logged in</span>
+            <button id="logoutBtn" class="ghost-btn hidden">Logout</button>
+          </div>
+        </aside>
+
+        <div class="content">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Finance Dashboard</p>
+              <h1 id="companyNameTitle">Company Overview</h1>
+            </div>
+            <div class="topbar-actions">
+              <button class="theme-toggle" type="button" data-theme-toggle>
+                <span data-theme-icon>Dark</span>
+              </button>
+              <div class="connection-pill">
+                <span class="live-dot"></span>
+                <span>Connected</span>
+              </div>
+            </div>
+          </header>
+
+          <section id="overview" class="stats-grid"></section>
+
+          <section class="page-grid two-panels">
+            <article class="card insight-card">
+              <span class="card-kicker">Cash position</span>
+              <h2 id="openBalanceText">$0.00</h2>
+              <p>Open balance from issued invoices after recorded payments.</p>
+            </article>
+            <article class="card insight-card alt">
+              <span class="card-kicker">Workflow</span>
+              <h2 id="workflowText">0 items</h2>
+              <p>Accounts, customers and invoices currently active in the workspace.</p>
+            </article>
+          </section>
+
+          <section id="accounts" class="page-grid accounts-layout">
+            <form id="accountForm" class="card form-card">
+              <div class="card-title">
+                <div>
+                  <span>Chart of accounts</span>
+                  <h2>Add Account</h2>
+                </div>
+              </div>
+              <div class="form-grid two-cols">
+                <label>Code<input name="code" placeholder="1000" required /></label>
+                <label>Currency<input name="currency" placeholder="USD" value="USD" required /></label>
+              </div>
+              <label>Name<input name="name" placeholder="Cash account" required /></label>
+              <label>Type
+                <select name="type" required>
+                  <option value="ASSET">Asset</option>
+                  <option value="LIABILITY">Liability</option>
+                  <option value="EQUITY">Equity</option>
+                  <option value="REVENUE">Revenue</option>
+                  <option value="EXPENSE">Expense</option>
+                </select>
+              </label>
+              <button type="submit" class="primary-btn">Add Account</button>
+            </form>
+
+            <form id="customerForm" class="card form-card">
+              <div class="card-title">
+                <div>
+                  <span>Customers</span>
+                  <h2>Add Customer</h2>
+                </div>
+              </div>
+              <label>Name<input name="name" placeholder="Customer name" required /></label>
+              <label>Email<input name="email" type="email" placeholder="client@email.com" /></label>
+              <button type="submit" class="primary-btn">Add Customer</button>
+            </form>
+
+            <div class="card table-card large-panel">
+              <div class="card-title">
+                <div>
+                  <span>Ledger setup</span>
+                  <h2>Account List</h2>
+                </div>
+                <span class="table-note" id="accountsCount">0 accounts</span>
+              </div>
+              <div id="accountsList" class="data-list"></div>
+            </div>
+          </section>
+
+          <section id="sales" class="page-grid sales-layout">
+            <form id="invoiceForm" class="card form-card">
+              <div class="card-title">
+                <div>
+                  <span>Billing</span>
+                  <h2>Create Invoice</h2>
+                </div>
+              </div>
+              <label>Customer<select name="customerId" id="invoiceCustomer" required></select></label>
+              <div class="form-grid two-cols">
+                <label>Total<input name="total" type="number" min="1" step="0.01" placeholder="2500" required /></label>
+                <label>Status
+                  <select name="status">
+                    <option value="DRAFT">Draft</option>
+                    <option value="SENT">Sent</option>
+                  </select>
+                </label>
+              </div>
+              <button type="submit" class="primary-btn">Create Invoice</button>
+            </form>
+
+            <form id="paymentForm" class="card form-card">
+              <div class="card-title">
+                <div>
+                  <span>Cash flow</span>
+                  <h2>Record Payment</h2>
+                </div>
+              </div>
+              <label>Invoice<select name="invoiceId" id="paymentInvoice"></select></label>
+              <div class="form-grid two-cols">
+                <label>Amount<input name="amount" type="number" min="1" step="0.01" placeholder="500" required /></label>
+                <label>Method<input name="method" placeholder="Cash" value="Cash" required /></label>
+              </div>
+              <button type="submit" class="primary-btn">Record Payment</button>
+            </form>
+
+            <div class="card table-card large-panel">
+              <div class="card-title">
+                <div>
+                  <span>Invoices</span>
+                  <h2>Sales Register</h2>
+                </div>
+                <span class="table-note" id="invoicesCount">0 invoices</span>
+              </div>
+              <div id="invoicesList" class="data-list"></div>
+            </div>
+          </section>
+
+          <section id="journal" class="card form-card wide-card">
+            <div class="card-title">
+              <div>
+                <span>Double entry</span>
+                <h2>Create Journal Entry</h2>
+              </div>
+            </div>
+            <form id="journalForm" class="journal-form">
+              <label>Description<input name="description" placeholder="Entry description" /></label>
+              <div class="form-grid three-cols">
+                <label>Debit Account<select id="debitAccount" required></select></label>
+                <label>Credit Account<select id="creditAccount" required></select></label>
+                <label>Amount<input id="journalAmount" type="number" min="1" step="0.01" placeholder="1000" required /></label>
+              </div>
+              <button type="submit" class="primary-btn">Create Balanced Entry</button>
+            </form>
+          </section>
+
+          <section class="card table-card wide-card">
+            <div class="card-title">
+              <div>
+                <span>Entries</span>
+                <h2>Journal Register</h2>
+              </div>
+              <span class="table-note" id="journalCount">0 entries</span>
+            </div>
+            <div id="journalList" class="data-list"></div>
+          </section>
+
+          <section id="reports" class="card table-card wide-card">
+            <div class="card-title">
+              <div>
+                <span>Trial Balance</span>
+                <h2>Posted Entries Report</h2>
+              </div>
+              <span class="table-note">Debit and credit totals</span>
+            </div>
+            <div class="table-head">
+              <span>Code</span>
+              <span>Account</span>
+              <span>Debit</span>
+              <span>Credit</span>
+            </div>
+            <div id="trialBalance" class="data-table"></div>
+          </section>
+        </div>
+      </section>
+
+      <div id="toast" class="toast hidden"></div>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,10 +1,8 @@
 import Joi from "joi";
 
 export const createJournalSchema = Joi.object({
-  description: Joi.string().optional(),
+  description: Joi.string().allow("").optional(),
   date: Joi.date().optional(),
-  companyId: Joi.string().required(),
-  userId: Joi.string().required(),
   transactions: Joi.array()
     .items(
       Joi.object({
@@ -25,7 +23,7 @@ export type TransactionInput = {
 };
 
 export type CreateJournalEntryInput = {
-  description: string;
+  description?: string;
   date?: Date;
   companyId: string;
   userId: string;

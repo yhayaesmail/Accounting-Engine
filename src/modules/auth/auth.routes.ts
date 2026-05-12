@@ -11,7 +11,7 @@ const router = Router();
 
 router.post('/register-company', registerController);
 router.post('/login', loginController);
-router.post('/refresh',authMiddleware, refreshTokenController);
+router.post('/refresh', refreshTokenController);
 router.post('/logout',authMiddleware, logoutController); 
 
 export default router;

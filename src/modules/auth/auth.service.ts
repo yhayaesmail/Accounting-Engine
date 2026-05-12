@@ -53,7 +53,7 @@ export const register = async (data: RegisterInput) => {
       });
       return { company, user };
     });
-    const { user } = result;
+    const { user, company } = result;
     const accessToken = generateAccessToken({
       userId: user.id,
       role: user.role,
@@ -74,6 +74,10 @@ export const register = async (data: RegisterInput) => {
         id: user.id,
         email: user.email,
         role: user.role,
+      },
+      company: {
+        id: company.id,
+        name: company.name,
       },
       tokens: {
         accessToken,
@@ -103,6 +107,9 @@ export const login = async (data: LoginInput) => {
     }
     const user = await prisma.user.findUnique({
       where: { email },
+      include: {
+        company: true,
+      },
     });
     if (!user) {
       await redis.incr(rateKey);
@@ -135,6 +142,12 @@ export const login = async (data: LoginInput) => {
         email: user.email,
         role: user.role,
       },
+      company: user.company
+        ? {
+            id: user.company.id,
+            name: user.company.name,
+          }
+        : null,
       tokens: {
         accessToken,
         refreshToken,

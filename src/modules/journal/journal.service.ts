@@ -1,10 +1,8 @@
-import { log } from "node:console";
 import prisma from "../../config/prisma.js";
 import {
   BadRequestError,
   ConflictError,
   NotFoundError,
-  UnauthorizedError,
 } from "../../utils/errors.js";
 import { logger } from "../../utils/logger.js";
 import { CreateJournalEntryInput  } from "./journal.validation.js";
@@ -51,7 +49,7 @@ export const createJournalEntry = async (data: CreateJournalEntryInput) => {
       }
       const createdEntry = await tx.journalEntry.create({
         data: {
-          description,
+          description: description ?? "",
           date,
           companyId,
           userId,
