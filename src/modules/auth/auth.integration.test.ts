@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { register,login,logout,refreshToken } from "./auth.service.js";
+import { describe, it, expect, beforeEach, afterAll } from "vitest";
+import { register, login, logout, refreshToken } from "./auth.service.js";
 import prisma from "../../config/prisma.js";
 import { redis } from "../../config/redis.js";
 
@@ -16,18 +16,25 @@ beforeEach(async () => {
   await redis.flushall();
 });
 
+afterAll(async () => {
+  await prisma.$disconnect();
+});
+
+const uniqueEmail = () => `test-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.com`;
+
 describe("Auth Integration Tests", () => {
   // ================= REGISTER =================
   describe("Register", () => {
     it("should register new user successfully", async () => {
+      const email = uniqueEmail();
       const result = await register({
-        email: "test@test.com",
+        email,
         password: "12345678",
         companyName: "testCompany",
       });
 
       expect(result.success).toBe(true);
-      expect(result.user.email).toBe("test@test.com");
+      expect(result.user.email).toBe(email);
       expect(result.tokens.accessToken).toBeDefined();
       expect(result.tokens.refreshToken).toBeDefined();
     });
@@ -44,14 +51,14 @@ describe("Auth Integration Tests", () => {
 
     it("should throw error if email already exists", async () => {
       await register({
-        email: "test@test.com",
+        email: "dup@test.com",
         password: "12345678",
         companyName: "company1",
       });
 
       await expect(
         register({
-          email: "test@test.com",
+          email: "dup@test.com",
           password: "12345678",
           companyName: "company2",
         })
@@ -60,14 +67,14 @@ describe("Auth Integration Tests", () => {
 
     it("should throw error if company already exists", async () => {
       await register({
-        email: "a@test.com",
+        email: uniqueEmail(),
         password: "12345678",
         companyName: "sameCompany",
       });
 
       await expect(
         register({
-          email: "b@test.com",
+          email: uniqueEmail(),
           password: "12345678",
           companyName: "sameCompany",
         })
@@ -77,7 +84,7 @@ describe("Auth Integration Tests", () => {
     it("should fail if password less than 8", async () => {
       await expect(
         register({
-          email: "fail@test.com",
+          email: uniqueEmail(),
           password: "123",
           companyName: "failCompany",
         })
@@ -85,22 +92,18 @@ describe("Auth Integration Tests", () => {
     });
   });
 
-
-
-
-
-
   // ================= LOGIN =================
   describe("Login", () => {
     it("should login successfully", async () => {
+      const email = uniqueEmail();
       await register({
-        email: "test@test.com",
+        email,
         password: "12345678",
         companyName: "testCompany",
       });
 
       const result = await login({
-        email: "test@test.com",
+        email,
         password: "12345678",
       });
 
@@ -118,51 +121,51 @@ describe("Auth Integration Tests", () => {
     });
 
     it("should fail if password is wrong", async () => {
+      const email = uniqueEmail();
       await register({
-        email: "test@test.com",
+        email,
         password: "12345678",
         companyName: "testCompany",
       });
 
       await expect(
         login({
-          email: "test@test.com",
+          email,
           password: "wrongpass",
         })
       ).rejects.toThrow();
     });
 
     it("should block after too many attempts", async () => {
+      const email = uniqueEmail();
       await register({
-        email: "test@test.com",
+        email,
         password: "12345678",
         companyName: "testCompany",
       });
       for (let i = 0; i < 5; i++) {
         try {
           await login({
-            email: "test@test.com",
+            email,
             password: "wrong",
           });
-        } catch {}
+        } catch { /* expected */ }
       }
       await expect(
         login({
-          email: "test@test.com",
+          email,
           password: "12345678",
         })
       ).rejects.toThrow("Too many attempts");
     });
   });
 
-
-
-
   // ================= REFRESH TOKEN =================
   describe("Refresh Token", () => {
     it("should refresh access token", async () => {
+      const email = uniqueEmail();
       const reg = await register({
-        email: "test@test.com",
+        email,
         password: "12345678",
         companyName: "testCompany",
       });
@@ -183,15 +186,12 @@ describe("Auth Integration Tests", () => {
     });
   });
 
-
-
-
-
   // ================= LOGOUT =================
   describe("Logout", () => {
     it("should logout successfully", async () => {
+      const email = uniqueEmail();
       const reg = await register({
-        email: "test@test.com",
+        email,
         password: "12345678",
         companyName: "testCompany",
       });
@@ -202,8 +202,9 @@ describe("Auth Integration Tests", () => {
     });
 
     it("should fail if already logged out", async () => {
+      const email = uniqueEmail();
       const reg = await register({
-        email: "test@test.com",
+        email,
         password: "12345678",
         companyName: "testCompany",
       });

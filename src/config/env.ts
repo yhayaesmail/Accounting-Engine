@@ -2,10 +2,17 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const requiredVars = ["DATABASE_URL", "JWT_SECRET", "JWT_REFRESH_SECRET"] as const;
+for (const key of requiredVars) {
+  if (!process.env[key]) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+}
+
 export const env = {
   PORT: process.env.PORT || 3000,
-  DATABASE_URL: process.env.DATABASE_URL as string,
-  JWT_SECRET: process.env.JWT_SECRET as string,
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
-  REDIS_URL: process.env.REDIS_URL
+  DATABASE_URL: process.env.DATABASE_URL!,
+  JWT_SECRET: process.env.JWT_SECRET!,
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
+  REDIS_URL: process.env.REDIS_URL,
 };

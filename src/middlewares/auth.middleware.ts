@@ -27,6 +27,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 
     next();
   } catch (err: any) {
-    next(new UnauthorizedError(err.message || "Invalid token"));
+    next(new UnauthorizedError(err?.message || "Invalid token"));
   }
 };

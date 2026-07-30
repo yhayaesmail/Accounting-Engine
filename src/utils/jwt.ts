@@ -1,8 +1,9 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
+import { env } from "../config/env.js";
 
-const ACCESS_SECRET = process.env.JWT_SECRET!;
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET!;
+const ACCESS_SECRET = env.JWT_SECRET;
+const REFRESH_SECRET = env.JWT_REFRESH_SECRET || env.JWT_SECRET;
 
 interface TokenPayload extends JwtPayload {
   userId: string;

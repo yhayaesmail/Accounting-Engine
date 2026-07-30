@@ -41,6 +41,7 @@ export const createJournalEntry = async (data: CreateJournalEntryInput) => {
         where: {
           id: { in: accountIds },
           companyId,
+          deletedAt: null,
         },
       });
       if (accounts.length !== accountIds.length) {
@@ -87,12 +88,12 @@ export const getAllJournalEntries = async (
       if (!companyId) {
     throw new BadRequestError("Company ID is required");
   }
-  if (page < 1 || limit < 1) {
+  if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
     throw new BadRequestError("Page and limit must be positive integers");
   }
   const skip = (page - 1) * limit;
   const totalEntries = await prisma.journalEntry.count({
-    where: { companyId },
+    where: { companyId, deletedAt: null },
   });
   const entries = await prisma.journalEntry.findMany({
     where: { companyId ,deletedAt: null},

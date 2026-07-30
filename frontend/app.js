@@ -1,8 +1,10 @@
+const safeJSON = (str) => { try { return JSON.parse(str); } catch { return null; } };
+
 const state = {
   token: localStorage.getItem("accessToken"),
   refreshToken: localStorage.getItem("refreshToken"),
-  user: JSON.parse(localStorage.getItem("user") || "null"),
-  company: JSON.parse(localStorage.getItem("company") || "null"),
+  user: safeJSON(localStorage.getItem("user")),
+  company: safeJSON(localStorage.getItem("company")),
   theme: localStorage.getItem("theme") || "light",
   accounts: [],
   customers: [],
@@ -27,11 +29,16 @@ const initials = (value) => {
   return name.split(" ").slice(0, 2).map((word) => word.charAt(0)).join("").toUpperCase() || "CO";
 };
 
+const esc = (str) => String(str).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[m]);
+
+let toastTimer;
 const showToast = (message) => {
   const toast = qs("#toast");
+  if (!toast) return;
+  clearTimeout(toastTimer);
   toast.textContent = message;
   toast.classList.remove("hidden");
-  setTimeout(() => toast.classList.add("hidden"), 2800);
+  toastTimer = setTimeout(() => toast.classList.add("hidden"), 2800);
 };
 
 const api = async (url, options = {}) => {
@@ -51,10 +58,10 @@ const api = async (url, options = {}) => {
 };
 
 const saveSession = (result) => {
-  state.token = result.tokens.accessToken;
-  state.refreshToken = result.tokens.refreshToken;
-  state.user = result.user;
-  state.company = result.company || state.company;
+  state.token = result?.tokens?.accessToken;
+  state.refreshToken = result?.tokens?.refreshToken;
+  state.user = result?.user;
+  state.company = result?.company || state.company;
   localStorage.setItem("accessToken", state.token);
   localStorage.setItem("refreshToken", state.refreshToken);
   localStorage.setItem("user", JSON.stringify(state.user));
@@ -108,82 +115,102 @@ const toggleView = () => {
 };
 
 const renderStats = (dashboard) => {
+  const d = dashboard || {};
   const stats = [
-    { label: "Accounts", value: dashboard.accounts, foot: "Active chart records", icon: "A" },
-    { label: "Customers", value: dashboard.customers, foot: "Saved customer profiles", icon: "C" },
-    { label: "Invoice Total", value: money(dashboard.invoiceTotal), foot: `${dashboard.invoices} invoices issued`, icon: "I" },
-    { label: "Open Balance", value: money(dashboard.openBalance), foot: `${money(dashboard.paidTotal)} collected`, icon: "B" },
+    { label: "Accounts", value: d.accounts, foot: "Active chart records", icon: "A" },
+    { label: "Customers", value: d.customers, foot: "Saved customer profiles", icon: "C" },
+    { label: "Invoice Total", value: money(d.invoiceTotal), foot: `${d.invoices} invoices issued`, icon: "I" },
+    { label: "Open Balance", value: money(d.openBalance), foot: `${money(d.paidTotal)} collected`, icon: "B" },
   ];
-  qs("#overview").innerHTML = stats.map((item) => `
+  const overview = qs("#overview");
+  if (overview) overview.innerHTML = stats.map((item) => `
     <article class="stat-card">
       <div class="stat-top">
-        <span>${item.label}</span>
-        <span class="stat-icon">${item.icon}</span>
+        <span>${esc(item.label)}</span>
+        <span class="stat-icon">${esc(item.icon)}</span>
       </div>
-      <div class="stat-value">${item.value}</div>
-      <div class="stat-foot">${item.foot}</div>
+      <div class="stat-value">${esc(item.value)}</div>
+      <div class="stat-foot">${esc(item.foot)}</div>
     </article>
   `).join("");
-  qs("#openBalanceText").textContent = money(dashboard.openBalance);
-  qs("#workflowText").textContent = `${dashboard.accounts + dashboard.customers + dashboard.invoices} items`;
+  const openBalanceEl = qs("#openBalanceText");
+  if (openBalanceEl) openBalanceEl.textContent = money(d.openBalance);
+  const workflowEl = qs("#workflowText");
+  if (workflowEl) workflowEl.textContent = `${Number(d.accounts ?? 0) + Number(d.customers ?? 0) + Number(d.invoices ?? 0)} items`;
 };
 
 const fillSelect = (element, items, getLabel, emptyText) => {
   if (!element) return;
-  element.innerHTML = `<option value="">${emptyText}</option>` + items.map((item) => `<option value="${item.id}">${getLabel(item)}</option>`).join("");
+  element.innerHTML = `<option value="">${esc(emptyText)}</option>` + items.map((item) => `<option value="${esc(item.id)}">${esc(getLabel(item))}</option>`).join("");
 };
 
-const emptyState = (text) => `<div class="empty-state">${text}</div>`;
+const emptyState = (text) => `<div class="empty-state">${esc(text)}</div>`;
 
 const renderAccounts = () => {
-  qs("#accountsList").innerHTML = state.accounts.length ? state.accounts.map((account) => `
+  const list = qs("#accountsList");
+  if (!list) return;
+  list.innerHTML = state.accounts.length ? state.accounts.map((account) => `
     <div class="list-row">
       <div class="row-main">
-        <strong>${account.code} - ${account.name}</strong>
-        <span>${account.currency} account</span>
+        <strong>${esc(account.code)} - ${esc(account.name)}</strong>
+        <span>${esc(account.currency)} account</span>
       </div>
-      <span class="badge">${account.type}</span>
+      <span class="badge">${esc(account.type)}</span>
     </div>
   `).join("") : emptyState("Create your first account to start posting journal entries.");
-  qs("#accountsCount").textContent = `${state.accounts.length} accounts`;
+  const countEl = qs("#accountsCount");
+  if (countEl) countEl.textContent = `${state.accounts.length} accounts`;
 };
 
 const renderInvoices = () => {
-  qs("#invoicesList").innerHTML = state.invoices.length ? state.invoices.map((invoice) => {
+  const list = qs("#invoicesList");
+  if (!list) return;
+  list.innerHTML = state.invoices.length ? state.invoices.map((invoice) => {
     const paid = invoice.status === "PAID";
+    const dateStr = (() => { try { return new Date(invoice.issuedAt).toLocaleDateString(); } catch { return ""; } })();
     return `
       <div class="list-row">
         <div class="row-main">
-          <strong>${invoice.customer?.name || "Customer"} - ${money(invoice.total)}</strong>
-          <span>${new Date(invoice.issuedAt).toLocaleDateString()}</span>
+          <strong>${esc(invoice.customer?.name || "Customer")} - ${esc(money(invoice.total))}</strong>
+          <span>${esc(dateStr)}</span>
         </div>
-        <span class="badge ${paid ? "success" : "warning"}">${invoice.status}</span>
+        <span class="badge ${paid ? "success" : "warning"}">${esc(invoice.status)}</span>
       </div>
     `;
   }).join("") : emptyState("Invoices will appear here after you create a customer.");
-  qs("#invoicesCount").textContent = `${state.invoices.length} invoices`;
+  const countEl = qs("#invoicesCount");
+  if (countEl) countEl.textContent = `${state.invoices.length} invoices`;
 };
 
 const renderJournal = () => {
-  qs("#journalList").innerHTML = state.journalEntries.length ? state.journalEntries.map((entry) => `
-    <div class="list-row">
-      <div class="row-main">
-        <strong>${entry.description || "Journal entry"}</strong>
-        <span>${new Date(entry.date).toLocaleDateString()} - ${entry.transactions.length} transactions</span>
+  const list = qs("#journalList");
+  if (!list) return;
+  list.innerHTML = state.journalEntries.length ? state.journalEntries.map((entry) => {
+    const dateStr = (() => { try { return new Date(entry.date).toLocaleDateString(); } catch { return ""; } })();
+    return `
+      <div class="list-row">
+        <div class="row-main">
+          <strong>${esc(entry.description || "Journal entry")}</strong>
+          <span>${esc(dateStr)} - ${esc(String(entry.transactions?.length ?? 0))} transactions</span>
+        </div>
+        <span class="badge ${entry.status === "POSTED" ? "success" : "warning"}">${esc(entry.status)}</span>
       </div>
-      <span class="badge ${entry.status === "POSTED" ? "success" : "warning"}">${entry.status}</span>
-    </div>
-  `).join("") : emptyState("Journal entries will appear here after you create one.");
-  qs("#journalCount").textContent = `${state.journalEntries.length} entries`;
+    `;
+  }).join("") : emptyState("Journal entries will appear here after you create one.");
+  const countEl = qs("#journalCount");
+  if (countEl) countEl.textContent = `${state.journalEntries.length} entries`;
 };
 
 const renderTrialBalance = (trialBalance) => {
-  qs("#trialBalance").innerHTML = trialBalance.rows.length ? trialBalance.rows.map((row) => `
+  const el = qs("#trialBalance");
+  if (!el) return;
+  const rows = trialBalance?.rows;
+  el.innerHTML = rows?.length ? rows.map((row) => `
     <div class="table-row">
-      <strong>${row.code}</strong>
-      <span>${row.name}</span>
-      <span>${money(row.debit)}</span>
-      <span>${money(row.credit)}</span>
+      <strong>${esc(row.code)}</strong>
+      <span>${esc(row.name)}</span>
+      <span>${esc(money(row.debit))}</span>
+      <span>${esc(money(row.credit))}</span>
     </div>
   `).join("") : emptyState("Post journal entries to build the trial balance.");
 };
@@ -197,20 +224,21 @@ const renderSelects = () => {
 
 const loadData = async () => {
   if (!state.token) return;
+  const safeApi = async (url, fallback) => { try { return await api(url); } catch { return fallback; } };
   const [dashboard, accounts, customers, invoices, payments, journalResult, trialBalance] = await Promise.all([
-    api("/api/reports/dashboard"),
-    api("/api/accounts"),
-    api("/api/customers"),
-    api("/api/invoices"),
-    api("/api/payments"),
-    api("/api/journal"),
-    api("/api/reports/trial-balance"),
+    safeApi("/api/reports/dashboard", {}),
+    safeApi("/api/accounts", []),
+    safeApi("/api/customers", []),
+    safeApi("/api/invoices", []),
+    safeApi("/api/payments", []),
+    safeApi("/api/journal", { data: [] }),
+    safeApi("/api/reports/trial-balance", { rows: [] }),
   ]);
   state.accounts = accounts;
   state.customers = customers;
   state.invoices = invoices;
   state.payments = payments;
-  state.journalEntries = journalResult.data || [];
+  state.journalEntries = journalResult?.data || journalResult || [];
   renderStats(dashboard);
   renderSelects();
   renderAccounts();
