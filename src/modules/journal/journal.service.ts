@@ -120,7 +120,7 @@ export const getAllJournalEntries = async (
     },
   };
   }catch (error) {
-  logger.error("Create Journal Entry Failed", {
+  logger.error("Fetch All Journal Entries Failed", {
     error,
     companyId,
   });
