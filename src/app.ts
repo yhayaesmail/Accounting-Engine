@@ -16,7 +16,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const frontendPath = path.resolve(__dirname, "../frontend");
 
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
 app.use(express.static(frontendPath));
 app.use('/api/auth', authRoutes);
 app.use('/api/accounts', accountRoutes);
