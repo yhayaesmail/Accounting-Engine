@@ -1,140 +1,209 @@
 # Accounting Engine
 
-Accounting Engine is a full-stack financial management system for small and growing companies. It combines a TypeScript backend with a clean vanilla HTML/CSS/JavaScript dashboard to manage the core accounting workflow: company registration, authentication, accounts, customers, invoices, payments, journal entries, and financial reports.
+A full-stack financial management system for small and growing businesses. It pairs a modular TypeScript/Express backend with a lightweight vanilla HTML, CSS, and JavaScript dashboard to cover the core accounting workflow — company registration, authentication, chart of accounts, customers, invoices, payments, journal entries, and financial reporting.
 
-## Project Goal
+## Table of Contents
 
-Many small businesses start tracking their financial operations in spreadsheets, which quickly becomes hard to control as invoices, payments, accounts, and manual journal entries increase. This project aims to provide a structured accounting backend with a simple dashboard that keeps financial data organized, validated, and connected to one company workspace.
+- [Project Overview](#project-overview)
+- [Problem Statement](#problem-statement)
+- [Solution](#solution)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [API Reference](#api-reference)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Accounting Business Rules](#accounting-business-rules)
+- [Frontend](#frontend)
+- [Security](#security)
+- [Roadmap](#roadmap)
+- [Author Notes](#author-notes)
 
-## Problem
+---
 
-Small teams often face the same accounting software problems:
+## Project Overview
 
-- Financial data is spread across disconnected sheets and tools.
-- Manual entries can become unbalanced or inconsistent.
-- User access and company data are not clearly separated.
-- Basic reports are difficult to generate from raw operational data.
-- Backend projects often stop at CRUD without real business rules.
+Many small companies begin managing their finances in spreadsheets. As invoices, payments, accounts, and manual journal entries grow, that approach becomes difficult to control and audit. Accounting Engine provides a structured, validated, and company-scoped backend with a simple dashboard so financial data stays organized, consistent, and connected to a single company workspace.
+
+## Problem Statement
+
+Small teams commonly face the following accounting software challenges:
+
+- Financial data scattered across disconnected spreadsheets and tools.
+- Manual journal entries that are unbalanced or inconsistent.
+- No clear separation between user access and company data.
+- Basic reporting is hard to produce from raw operational data.
+- Backend projects stop at CRUD without modeling real business rules.
 
 ## Solution
 
-Accounting Engine solves this by introducing a modular backend around real accounting concepts:
+Accounting Engine addresses these problems with a modular backend built around real accounting concepts:
 
-- Multi-company authentication and company-level data isolation.
-- Chart of accounts for organizing financial records.
-- Double-entry journal entries with debit and credit validation.
-- Customer, invoice, and payment workflows.
-- Trial balance and dashboard reporting.
-- A responsive frontend dashboard served directly from the backend.
+- **Multi-company authentication** with company-level data isolation.
+- **Chart of accounts** for organizing financial records.
+- **Double-entry journal entries** with enforced debit/credit balancing.
+- **Customer, invoice, and payment** workflows.
+- **Trial balance and dashboard reporting** over posted entries.
+- **Responsive dashboard** served directly by the backend.
 
 ## Key Features
 
 - Company registration with admin user creation.
-- Login, logout, refresh token, and JWT authentication.
-- Redis-based login rate limiting with an in-memory local fallback.
-- Accounts module with account code, type, currency, and hierarchy support.
-- Customers and vendors modules.
-- Invoice and payment tracking.
-- Journal entries with balanced debit and credit transactions.
-- Trial balance report based on posted journal entries.
-- Dashboard metrics for accounts, customers, invoices, paid amount, and open balance.
-- Responsive vanilla frontend with dark and light mode.
+- Full JWT authentication: register, login, logout, and refresh-token flow.
+- Redis-backed login rate limiting with an in-memory local fallback.
+- Chart of accounts with account code, type, currency, and hierarchy support.
+- Customers, vendors, invoices, and payments modules.
+- Double-entry journal with balanced debit/credit validation and posting.
+- Trial balance report derived from posted journal entries.
+- Dashboard metrics: accounts, customers, invoices, paid amount, and open balance.
+- Responsive vanilla frontend with dark/light mode.
 
 ## Tech Stack
 
-- Node.js
-- Express.js
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- Redis
-- Vitest
-- Docker
+| Layer       | Technology                                          |
+| ----------- | --------------------------------------------------- |
+| Runtime     | Node.js >= 22                                        |
+| Framework   | Express.js                                           |
+| Language    | TypeScript                                           |
+| ORM         | Prisma                                               |
+| Database    | PostgreSQL                                           |
+| Cache       | Redis (sessions, rate limiting)                      |
+| Validation  | Joi                                                  |
+| Testing     | Vitest                                               |
 
 ## Architecture
 
-The backend follows a simple module-based structure:
+The backend follows a clean, module-based structure where each business domain lives in its own folder:
 
 ```text
 src
-  modules
-    auth
-    accounts
-    customers
-    vendors
-    invoices
-    payments
-    journal
-    reports
-  middlewares
-  config
-  utils
-  types
-frontend
-  index.html
-  styles.css
-  app.js
-prisma
-  schema.prisma
+├── modules
+│   ├── auth
+│   ├── accounts
+│   ├── customers
+│   ├── vendors
+│   ├── invoices
+│   ├── payments
+│   ├── journal
+│   └── reports
+├── middlewares      # auth, role, error handling
+├── config           # env, prisma, redis
+├── utils            # jwt, hashing, logger, errors
+├── types
+└── server.ts
 ```
 
-Each business module is organized around:
+Each module is organized around the same responsibilities:
 
-- `validation`: request schema and input types.
-- `service`: business logic and database operations.
-- `controller`: HTTP request and response handling.
-- `routes`: API route registration.
+- `validation` — request schemas and input types (Joi).
+- `service` — business logic and database operations.
+- `controller` — HTTP request/response handling.
+- `routes` — route registration and middleware wiring.
 
-## API Overview
+## API Reference
 
-```text
-POST   /api/auth/register-company
-POST   /api/auth/login
-POST   /api/auth/logout
-POST   /api/auth/refresh
+### Authentication
 
-GET    /api/accounts
-POST   /api/accounts
-PATCH  /api/accounts/:id
-DELETE /api/accounts/:id
+| Method | Endpoint               | Description                | Auth |
+| ------ | ---------------------- | -------------------------- | ---- |
+| POST   | `/api/auth/register-company` | Register a company + admin | No   |
+| POST   | `/api/auth/login`      | Login and receive tokens   | No   |
+| POST   | `/api/auth/refresh`    | Rotate an access token     | No   |
+| POST   | `/api/auth/logout`     | Invalidate the session     | Yes  |
 
-GET    /api/customers
-POST   /api/customers
-PATCH  /api/customers/:id
-DELETE /api/customers/:id
+### Core Modules
 
-GET    /api/vendors
-POST   /api/vendors
-PATCH  /api/vendors/:id
-DELETE /api/vendors/:id
+| Method | Endpoint                  | Description                       | Auth |
+| ------ | ------------------------- | --------------------------------- | ---- |
+| GET    | `/api/accounts`           | List accounts                     | Yes  |
+| POST   | `/api/accounts`           | Create an account                 | Yes  |
+| PATCH  | `/api/accounts/:id`       | Update an account                 | Yes  |
+| DELETE | `/api/accounts/:id`       | Delete an account                 | Yes  |
+| GET    | `/api/customers`          | List customers                    | Yes  |
+| POST   | `/api/customers`          | Create a customer                 | Yes  |
+| PATCH  | `/api/customers/:id`      | Update a customer                 | Yes  |
+| DELETE | `/api/customers/:id`      | Delete a customer                 | Yes  |
+| GET    | `/api/vendors`            | List vendors                      | Yes  |
+| POST   | `/api/vendors`            | Create a vendor                   | Yes  |
+| PATCH  | `/api/vendors/:id`        | Update a vendor                   | Yes  |
+| DELETE | `/api/vendors/:id`        | Delete a vendor                   | Yes  |
+| GET    | `/api/invoices`           | List invoices                     | Yes  |
+| POST   | `/api/invoices`           | Create an invoice                 | Yes  |
+| PATCH  | `/api/invoices/:id`       | Update an invoice                 | Yes  |
+| DELETE | `/api/invoices/:id`       | Delete an invoice                 | Yes  |
+| GET    | `/api/payments`           | List payments                     | Yes  |
+| POST   | `/api/payments`           | Record a payment                  | Yes  |
+| DELETE | `/api/payments/:id`       | Delete a payment                  | Yes  |
+| GET    | `/api/journal`            | List journal entries              | Yes  |
+| POST   | `/api/journal`            | Create a journal entry            | Yes  |
+| PATCH  | `/api/journal/:id/post`   | Post a journal entry              | Yes  |
+| DELETE | `/api/journal/:id`        | Delete a journal entry            | Yes  |
 
-GET    /api/invoices
-POST   /api/invoices
-PATCH  /api/invoices/:id
-DELETE /api/invoices/:id
+### Reports
 
-GET    /api/payments
-POST   /api/payments
-DELETE /api/payments/:id
-
-GET    /api/journal
-POST   /api/journal
-PATCH  /api/journal/:id/post
-DELETE /api/journal/:id
-
-GET    /api/reports/dashboard
-GET    /api/reports/trial-balance
-```
+| Method | Endpoint                       | Description              | Auth |
+| ------ | ------------------------------ | ------------------------ | ---- |
+| GET    | `/api/reports/dashboard`       | Dashboard metrics        | Yes  |
+| GET    | `/api/reports/trial-balance`   | Trial balance            | Yes  |
 
 ## Getting Started
 
-Install dependencies:
+### Prerequisites
+
+- Node.js >= 22
+- PostgreSQL
+- Redis
+
+### Installation
+
+1. Clone the repository.
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file — see [Environment Variables](#environment-variables).
+4. Run database migrations:
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+6. Open the dashboard:
+
+   ```text
+   http://localhost:4300
+   ```
+
+### Production
 
 ```bash
-npm install
+npm run build
+npm start
 ```
 
-Create a `.env` file:
+`npm start` applies pending migrations (`prisma migrate deploy`) and boots the compiled server.
+
+## Environment Variables
+
+| Variable                | Required | Description                          |
+| ----------------------- | -------- | ------------------------------------ |
+| `PORT`                  | No       | Server port (default: `3000`)        |
+| `DATABASE_URL`          | Yes      | PostgreSQL connection string         |
+| `JWT_SECRET`            | Yes      | Access-token signing secret          |
+| `JWT_REFRESH_SECRET`    | Yes      | Refresh-token signing secret         |
+| `REDIS_URL`             | No       | Redis connection URL (sessions/rate limiting) |
+
+Example:
 
 ```bash
 PORT=4300
@@ -144,98 +213,74 @@ JWT_REFRESH_SECRET="your_refresh_secret"
 REDIS_URL="redis://localhost:6379"
 ```
 
-Run database migrations:
+## Testing
 
-```bash
-npx prisma migrate dev
-```
+The project uses Vitest for unit and integration tests. Current coverage focuses on:
 
-Start the development server:
+- Authentication flow (register, login, logout, refresh token).
+- Journal entry business rules.
+- Balanced and unbalanced transaction validation.
+- Posting and soft-deletion flows.
 
-```bash
-npm run dev
-```
-
-Open the frontend:
-
-```bash
-http://localhost:4300
-```
-
-Run tests:
+Run the test suite:
 
 ```bash
 npm run test
 ```
 
-Build for production:
-
-```bash
-npm run build
-```
-
-Start production server:
-
-```bash
-npm start
-```
-
 ## Deployment
 
-The project can be deployed for free using Render, Supabase, and Upstash:
+The application is designed to run on managed services with a free tier:
 
-- Render hosts the Node.js web service and serves the frontend.
-- Supabase provides the PostgreSQL database.
-- Upstash provides Redis for sessions and rate limiting.
+- **Render** — hosts the Node.js web service and serves the frontend.
+- **Supabase** — provides the PostgreSQL database.
+- **Upstash** — provides Redis for sessions and rate limiting.
 
-Full deployment steps are available in [DEPLOYMENT.md](./DEPLOYMENT.md).
+For local containerized development, PostgreSQL and Redis are run via their standard Docker images.
+
+## Accounting Business Rules
+
+The engine enforces the following rules to keep the books accurate:
+
+- A journal entry must contain at least two transactions.
+- Each transaction is either a debit or a credit — never both.
+- Total debits must equal total credits before a journal entry is created.
+- Accounts must belong to the same company as the authenticated user.
+- Only posted journal entries contribute to the trial balance.
+- Payments cannot exceed the invoice total.
 
 ## Frontend
 
-The frontend is intentionally built with vanilla HTML, CSS, and JavaScript. It includes:
+The frontend is intentionally built with vanilla HTML, CSS, and JavaScript — no framework overhead. It includes:
 
-- Login and register screens.
-- Company-branded dashboard after login.
-- Dark and light mode with saved user preference.
+- Login and registration screens.
+- Company-branded dashboard after authentication.
+- Dark and light mode with a saved user preference.
 - Responsive sidebar navigation.
 - Dashboard metric cards.
 - Forms for accounts, customers, invoices, payments, and journal entries.
-- Lists and trial balance display connected to the backend API.
+- Data lists and a trial balance view wired to the backend API.
 
-## Accounting Rules Implemented
+## Security
 
-- A journal entry must contain at least two transactions.
-- Every transaction must be either debit or credit, not both.
-- Total debit must equal total credit before a journal entry is created.
-- Accounts must belong to the same company as the authenticated user.
-- Posted journal entries are used in the trial balance report.
-- Payments cannot exceed the invoice total.
+- JWT access tokens (short-lived) with refresh-token sessions stored in Redis.
+- Passwords hashed with bcrypt.
+- Joi request validation across all modules.
+- Login rate limiting via Redis.
+- Security headers enforced through Helmet.
 
-## Testing
+## Roadmap
 
-The project uses Vitest for unit and integration tests. Current test coverage focuses on:
-
-- Authentication flow.
-- Register, login, logout, and refresh token behavior.
-- Journal entry business rules.
-- Balanced and unbalanced transaction validation.
-- Posting and soft deletion flows.
-
-## Current Status
-
-This project is an ongoing learning-focused backend system. It is built to be clean, understandable, and realistic without being over-engineered. The current version is suitable as a portfolio project and as a strong base for adding more advanced accounting features.
-
-## Future Improvements
-
-- Use decimal database types for financial precision.
-- Add invoice line items.
-- Add user management inside each company.
-- Add audit logs.
-- Add account statements and general ledger report.
-- Add role-based permissions across modules.
-- Add Docker setup for PostgreSQL and Redis.
-- Add API documentation using Swagger or a Postman collection.
+- Decimal database types for financial precision.
+- Invoice line items.
+- Per-company user management.
+- Audit logging.
+- Account statements and general ledger reports.
+- Expanded role-based permissions across modules.
+- Swagger / OpenAPI documentation.
 
 ## Author Notes
 
 This project was designed as a practical backend engineering exercise focused on real business logic, data validation, authentication, and clean modular structure. The goal is to demonstrate the ability to build more than simple CRUD APIs by modeling a real accounting workflow.
+
+Frontend made by help of AI (GPT - DEEPSEEK - GM)
