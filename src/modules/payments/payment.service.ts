@@ -50,6 +50,15 @@ export const createPayment = async (data: CreatePaymentInput) => {
   });
 };
 
+
+
+
+
+
+
+
+
+
 export const getPayments = async (companyId: string) => {
   return prisma.payment.findMany({
     where: {

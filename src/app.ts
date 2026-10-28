@@ -1,7 +1,5 @@
 import express from "express";
 import helmet from "helmet";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import authRoutes from "./modules/auth/auth.routes.js";
 import accountRoutes from "./modules/accounts/account.routes.js";
 import customerRoutes from "./modules/customers/customer.routes.js";
@@ -13,13 +11,9 @@ import reportRoutes from "./modules/reports/report.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const frontendPath = path.resolve(__dirname, "../frontend");
 
 app.use(helmet());
 app.use(express.json({ limit: "100kb" }));
-app.use(express.static(frontendPath));
 app.use('/api/auth', authRoutes);
 app.use('/api/accounts', accountRoutes);
 app.use('/api/customers', customerRoutes);

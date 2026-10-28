@@ -1,4 +1,0 @@
-This file is outdated and retained for reference only.
-See the README.md for current project structure.
-
-Outdated module references: companies/, audit/, .model.ts files.

@@ -1,7 +1,7 @@
 {
   "name": "accounting-engine",
   "version": "1.0.0",
-  "description": "A full-stack accounting dashboard built with Node.js, TypeScript, Prisma, PostgreSQL, Redis, and vanilla frontend.",
+  "description": "A multi-company accounting API built with Node.js, TypeScript, Prisma, PostgreSQL, and Redis.",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch ./src/server.ts",

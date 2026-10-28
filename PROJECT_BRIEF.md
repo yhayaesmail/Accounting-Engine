@@ -2,23 +2,32 @@
 
 ## One-Line Summary
 
-Accounting Engine is a multi-company accounting backend with a professional vanilla JavaScript dashboard for managing accounts, invoices, payments, journal entries, and financial reports.
+Accounting Engine is a multi-company accounting API built with Node.js, TypeScript, Express, Prisma, and PostgreSQL for managing accounts, customers, invoices, payments, journal entries, and financial reports.
 
 ## Why This Project Matters
 
-The project demonstrates backend thinking beyond simple CRUD. It models real accounting concepts, validates financial rules, separates company data, and exposes a dashboard that makes the system usable from the browser.
+The project goes beyond basic CRUD by modeling real accounting concepts. It enforces double-entry rules, isolates company data, validates financial operations, and exposes consistent reporting endpoints. Each business domain is separated into its own module with clear responsibilities for routing, validation, business logic, and persistence.
 
+## Strongest Technical Areas
 
-## Best Portfolio Angle
-
-This project is best presented as a practical accounting SaaS prototype. The strongest part is the business logic around journal entries and the clean separation of backend modules.
+- Company-scoped data access derived from authenticated JWTs.
+- Double-entry journal validation and a separate posting workflow.
+- Invoice and payment rules, including overpayment protection and automatic paid status.
+- Trial balance reporting that only includes posted journal entries.
+- Centralized validation, error handling, and structured logging.
+- Optional Redis-backed sessions and login throttling with a local fallback.
 
 ## Suggested Demo Flow
 
-1. Register a company.
-2. Create two accounts.
-3. Add a customer.
-4. Create an invoice.
-5. Record a payment.
-6. Create a balanced journal entry.
-7. Show dashboard metrics and trial balance.
+1. Register a company and its admin user.
+2. Sign in and capture the access token.
+3. Create a small chart of accounts.
+4. Add a customer and issue an invoice.
+5. Record a payment and confirm the invoice status.
+6. Create a balanced journal entry and post it.
+7. Show the dashboard metrics and trial balance.
+8. Demonstrate a validation failure, such as an unbalanced journal entry or an overpayment.
+
+## Scope
+
+This repository contains the backend API only. It does not include a web client. Requests can be demonstrated with curl, Postman, or any HTTP client.
