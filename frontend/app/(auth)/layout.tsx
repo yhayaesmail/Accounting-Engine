@@ -5,10 +5,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="auth-frame">
       <Image
-        src="/login-background.jpg"
+        src="/login-background.jpg?v=2"
         alt=""
         fill
         priority
+        unoptimized
         sizes="100vw"
         className="auth-background"
       />

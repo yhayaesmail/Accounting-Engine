@@ -48,7 +48,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="auth-form auth-form-register">
+    <div className="auth-form">
       <div className="auth-form-head">
         <h1>Create a workspace</h1>
         <p>Set up a company and its first admin account.</p>
@@ -83,7 +83,7 @@ export default function RegisterPage() {
           label="Password"
           name="password"
           autoComplete="new-password"
-          placeholder="At least 8 characters"
+          placeholder="Your password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           minLength={8}

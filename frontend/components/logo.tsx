@@ -11,12 +11,13 @@ export function Logo({ compact = false, href = "/dashboard", className = "" }: L
   const content = (
     <>
       <Image
-        src="/logo-mark.png"
+        src="/logo-mark.png?v=2"
         alt=""
         width={320}
         height={221}
         className="brand-logo"
         sizes="72px"
+        unoptimized
         priority
       />
       {!compact && <span className="brand-name">Accounting Engine</span>}
@@ -50,12 +51,13 @@ export function BrandLoader({
       <div className="brand-loader-ring">
         <span className="brand-loader-arc" aria-hidden="true" />
         <Image
-          src="/logo-mark.png"
+          src="/logo-mark.png?v=2"
           alt=""
           width={320}
           height={221}
           className="brand-loader-logo"
           sizes="96px"
+          unoptimized
           priority
         />
       </div>
