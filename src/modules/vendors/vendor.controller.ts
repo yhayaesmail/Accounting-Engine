@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "../../types/auth.types.js";
 import { BadRequestError } from "../../utils/errors.js";
+import { validateRequest } from "../../utils/validation.js";
 import * as vendorService from "./vendor.service.js";
 import { createVendorSchema, updateVendorSchema } from "./vendor.validation.js";
 
@@ -9,10 +10,7 @@ export const createVendorController = async (req: AuthRequest, res: Response, ne
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const { error, value } = createVendorSchema.validate(req.body);
-    if (error) {
-      throw new BadRequestError(error.details[0].message);
-    }
+    const value = validateRequest(createVendorSchema, req.body);
     const vendor = await vendorService.createVendor({ ...value, companyId: req.user.companyId });
     res.status(201).json({ success: true, data: vendor });
   } catch (err) {
@@ -49,10 +47,7 @@ export const updateVendorController = async (req: AuthRequest, res: Response, ne
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const { error, value } = updateVendorSchema.validate(req.body);
-    if (error) {
-      throw new BadRequestError(error.details[0].message);
-    }
+    const value = validateRequest(updateVendorSchema, req.body);
     const vendor = await vendorService.updateVendor(req.params.id as string, req.user.companyId, value);
     res.status(200).json({ success: true, data: vendor });
   } catch (err) {

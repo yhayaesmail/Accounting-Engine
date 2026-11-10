@@ -92,6 +92,47 @@ describe("journal service", () => {
         })
       ).rejects.toThrow("Each transaction must have either debit OR credit");
     });
+    it("should throw if transaction has neither debit nor credit", async () => {
+      await expect(
+        createJournalEntry({
+          ...validData,
+          transactions: [
+            { accountId: "acc-1" },
+            { accountId: "acc-2", credit: 100 },
+          ],
+        })
+      ).rejects.toThrow("Each transaction must have either debit OR credit");
+    });
+    it("should throw if debit is negative", async () => {
+      await expect(
+        createJournalEntry({
+          ...validData,
+          transactions: [
+            { accountId: "acc-1", debit: -100 },
+            { accountId: "acc-2", credit: 100 },
+          ],
+        })
+      ).rejects.toThrow("Debit cannot be negative");
+    });
+    it("should throw if credit is negative", async () => {
+      await expect(
+        createJournalEntry({
+          ...validData,
+          transactions: [
+            { accountId: "acc-1", debit: 100 },
+            { accountId: "acc-2", credit: -50 },
+          ],
+        })
+      ).rejects.toThrow("Credit cannot be negative");
+    });
+    it("should throw if transactions array is empty", async () => {
+      await expect(
+        createJournalEntry({
+          ...validData,
+          transactions: [],
+        })
+      ).rejects.toThrow("At least 2 transactions are required");
+    });
     it("should throw on invalid or unauthorized account", async () => {
       (prisma.$transaction as any).mockImplementation(async (cb: any) => {
         return cb({

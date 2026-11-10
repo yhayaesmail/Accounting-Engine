@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "../../types/auth.types.js";
 import { BadRequestError } from "../../utils/errors.js";
+import { validateRequest } from "../../utils/validation.js";
 import * as paymentService from "./payment.service.js";
 import { createPaymentSchema } from "./payment.validation.js";
 
@@ -9,10 +10,7 @@ export const createPaymentController = async (req: AuthRequest, res: Response, n
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const { error, value } = createPaymentSchema.validate(req.body);
-    if (error) {
-      throw new BadRequestError(error.details[0].message);
-    }
+    const value = validateRequest(createPaymentSchema, req.body);
     const payment = await paymentService.createPayment({ ...value, companyId: req.user.companyId });
     res.status(201).json({ success: true, data: payment });
   } catch (err) {
