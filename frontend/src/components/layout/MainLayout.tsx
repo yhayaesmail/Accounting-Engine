@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { BackgroundWaves } from "./BackgroundWaves.tsx";
 import { Sidebar } from "./Sidebar.tsx";
 import { TopBar } from "./TopBar.tsx";
 import { ErrorBoundary } from "../ui/ErrorBoundary.tsx";
@@ -13,7 +12,6 @@ export function MainLayout() {
       <div className="app-body">
         <TopBar onMenu={() => {}} />
         <main className="main-content">
-          <BackgroundWaves />
           <ErrorBoundary key={location.pathname}>
             <Outlet />
           </ErrorBoundary>
@@ -22,3 +20,4 @@ export function MainLayout() {
     </div>
   );
 }
+

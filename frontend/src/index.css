@@ -378,9 +378,7 @@ table {
   width: var(--sidebar-width);
   flex-shrink: 0;
   border-right: var(--border);
-  /* Transparent so the solid bottom wave runs underneath, full-bleed.
-     The mobile slide-out (below) restores an opaque background. */
-  background-color: transparent;
+  background-color: var(--color-bg);
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -474,47 +472,7 @@ table {
   flex: 1;
   padding: var(--space-6);
   overflow-y: auto;
-  /* Transparent so the solid bottom wave shows through wherever the page
-     has no panels; panels themselves stay opaque white above it. */
-  background-color: transparent;
-}
-
-/* ─── Solid bottom wave ─── */
-/* Full-bleed (left: 0 → right: 0) solid teal wave anchored to the bottom of
-   the window, running underneath the transparent sidebar and content area.
-   z-index: -1 keeps it behind panels, text, and the sidebar; it shows through
-   wherever the page is empty. Solid fills only — no opacity washes. */
-.background-waves {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 180px;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.background-waves svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.background-waves .wave-back {
-  fill: var(--color-accent-strong);
-}
-
-.background-waves .wave-front {
-  fill: var(--color-accent);
-}
-
-@media print {
-  .background-waves {
-    display: none;
-  }
+  background-color: var(--color-bg);
 }
 
 .page-header {
@@ -604,6 +562,57 @@ table {
   font-size: 16px;
   font-weight: 800;
   margin-bottom: var(--space-5);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+/* ─── Journal entry form ─── */
+.journal-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: var(--space-5) 0 var(--space-3);
+}
+
+.journal-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 108px 108px 34px;
+  gap: 8px;
+  align-items: center;
+}
+
+.journal-line--head {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.journal-line--head span:last-child {
+  text-align: center;
+}
+
+.journal-line .input {
+  height: 38px;
+  padding: 0 var(--space-3);
+  font-size: 13px;
+}
+
+.journal-balance {
+  margin-top: var(--space-5);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.journal-balance--off {
+  color: var(--color-text-secondary);
 }
 
 /* ─── Auth: form anchored to the left edge ─── */
@@ -1047,16 +1056,12 @@ table {
     transition: transform var(--transition);
     z-index: 40;
     box-shadow: var(--shadow-md);
-    background-color: var(--color-bg);
   }
   .mobile-menu-btn {
     display: flex;
   }
   .main-content {
     padding: var(--space-4);
-  }
-  .background-waves {
-    height: 120px;
   }
   .page-header {
     flex-direction: column;
