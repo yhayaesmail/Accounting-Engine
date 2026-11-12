@@ -6,6 +6,22 @@ A React + Vite frontend lives in [`frontend/`](frontend/) and talks to this API.
 
 ---
 
+## Screenshots
+
+**Dashboard** — invoiced vs collected, receivables aging, top customers, top expenses
+
+![Dashboard with financial charts](docs/dashboard.png)
+
+**Vendors** — record vendor bills, pay them in one click
+
+![Vendors page with vendor bills panel](docs/vendor.png)
+
+**Invoices** — statuses flip to PAID automatically when payments cover the total
+
+![Invoices page with status badges](docs/invoice.png)
+
+---
+
 ## Features
 
 | Area | Capabilities |
