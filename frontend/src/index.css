@@ -571,6 +571,19 @@ table {
   margin-top: var(--space-6);
 }
 
+/* ─── Vendor bills panel ─── */
+.bills-panel {
+  margin-top: var(--space-4);
+}
+
+.bills-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
 /* ─── Journal entry form ─── */
 .journal-lines {
   display: flex;

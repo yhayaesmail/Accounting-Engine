@@ -41,6 +41,7 @@ model Company {
   vendors   Vendor[]
   invoices  Invoice[]
   payments  Payment[]
+  vendorBills VendorBill[]
 }
 
 
@@ -120,6 +121,7 @@ model Vendor {
   deletedAt DateTime?
   company   Company  @relation(fields: [companyId], references: [id])
   companyId String
+  bills     VendorBill[]
 }
 
 model Invoice {
@@ -145,4 +147,17 @@ model Payment {
   invoiceId  String?
   company    Company  @relation(fields: [companyId], references: [id])
   companyId  String
+}
+
+model VendorBill {
+  id        String   @id @default(uuid())
+  total     Float
+  status    String   @default("OPEN")
+  issuedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  vendorId  String
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
 }

@@ -70,6 +70,18 @@ export interface Payment {
   deletedAt: string | null;
 }
 
+export interface VendorBill {
+  id: string;
+  total: number;
+  status: string;
+  issuedAt: string;
+  companyId: string;
+  vendorId: string;
+  vendor?: Vendor;
+  createdAt: string;
+  deletedAt: string | null;
+}
+
 export interface Transaction {
   id: string;
   debit: number;

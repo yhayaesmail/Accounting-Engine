@@ -20,6 +20,7 @@ const { rows } = await client.query(`
     (SELECT count(*) FROM "Vendor")       AS vendors,
     (SELECT count(*) FROM "Invoice")      AS invoices,
     (SELECT count(*) FROM "Payment")      AS payments,
+    (SELECT count(*) FROM "VendorBill")   AS "vendorBills",
     (SELECT count(*) FROM "JournalEntry") AS journal
 `);
 
