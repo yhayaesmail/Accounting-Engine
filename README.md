@@ -1,8 +1,8 @@
 # Accounting Engine
 
-A multi-company accounting API built with Node.js, TypeScript, Express, Prisma, and PostgreSQL. Manages accounts, customers, vendors, invoices, payments, double-entry journal entries, and financial reports — with strict company-level data isolation.
+A multi-company accounting engine built with Node.js, TypeScript, Express, Prisma, and PostgreSQL. Manages accounts, customers, vendors, invoices, payments, double-entry journal entries, and financial reports — with strict company-level data isolation.
 
-> **Backend only.** No frontend is included. Test the API with curl, Postman, or any HTTP client.
+A React + Vite frontend lives in [`frontend/`](frontend/) and talks to this API.
 
 ---
 
@@ -15,6 +15,7 @@ A multi-company accounting API built with Node.js, TypeScript, Express, Prisma, 
 | **Customers & Vendors** | Create, read, update, soft-delete |
 | **Invoices** | Totals, statuses (DRAFT/SENT/PAID/CANCELLED), customer linking |
 | **Payments** | Linked to invoices or unapplied, overpayment protection, auto PAID status |
+| **Vendor bills** | Bills per vendor (OPEN → PAID), pay action, soft-delete |
 | **Journal entries** | Double-entry validation, DRAFT → POSTED workflow, debit = credit enforcement |
 | **Reports** | Dashboard metrics, trial balance from posted entries only |
 | **Data safety** | Soft deletes, company-scoped queries, centralized error handling |
@@ -75,6 +76,7 @@ REDIS_URL="redis://localhost:6379"
 | `JWT_SECRET` | Yes | — | Signing secret for access tokens |
 | `JWT_REFRESH_SECRET` | Yes | — | Signing secret for refresh tokens |
 | `REDIS_URL` | No | — | Redis connection URL (optional) |
+| `TEST_DATABASE_URL` | No | — | Override the test database used by `npm test` |
 | `NODE_ENV` | No | — | Set to `production` to hide stack traces |
 
 ### Run
@@ -143,6 +145,10 @@ Authorization: Bearer <accessToken>
 | `POST` | `/api/payments` | Bearer | Record a payment |
 | `GET` | `/api/payments/:id` | Bearer | Get one payment |
 | `DELETE` | `/api/payments/:id` | Bearer | Soft-delete a payment |
+| `GET` | `/api/vendor-bills` | Bearer | List vendor bills |
+| `POST` | `/api/vendor-bills` | Bearer | Create a vendor bill |
+| `POST` | `/api/vendor-bills/:id/pay` | Bearer | Mark a bill as paid |
+| `DELETE` | `/api/vendor-bills/:id` | Bearer | Soft-delete a bill |
 | `GET` | `/api/journal` | Bearer | List journal entries (paginated) |
 | `POST` | `/api/journal` | Bearer | Create a draft journal entry |
 | `PATCH` | `/api/journal/:id/post` | Bearer | Post a draft entry |
@@ -203,10 +209,10 @@ curl -s -X POST "$BASE/api/journal" \
 npm test
 ```
 
-- **Unit tests** (mocked Prisma, no database required): journal service, invoice service, payment service.
+- **Unit tests** (mocked Prisma, no database required): journal service, invoice service, payment service, vendor bill service.
 - **Integration tests** (require a test database): authentication flows, login throttling, refresh, logout.
 
-> **Warning:** Integration tests wipe all application tables before each run. Use a dedicated test database — never production data.
+> Integration tests run against an isolated database (your dev database's name + `_test`, created automatically) with an in-memory Redis fallback. Your original database and Redis are never touched by the suite. Set `TEST_DATABASE_URL` in `.env` to point the tests somewhere specific.
 
 ---
 

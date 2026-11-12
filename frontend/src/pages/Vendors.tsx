@@ -257,7 +257,6 @@ export default function Vendors() {
           value={billTotal}
           onChange={(e) => setBillTotal(e.target.value)}
           placeholder="e.g. 1200.00"
-          helper="Money you owe this vendor."
         />
         <Input
           label="Issue date"
