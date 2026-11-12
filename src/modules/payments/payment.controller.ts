@@ -3,14 +3,14 @@ import { AuthRequest } from "../../types/auth.types.js";
 import { BadRequestError } from "../../utils/errors.js";
 import { validateRequest } from "../../utils/validation.js";
 import * as paymentService from "./payment.service.js";
-import { createPaymentSchema } from "./payment.validation.js";
+import { createPaymentSchema, type CreatePaymentInput } from "./payment.validation.js";
 
 export const createPaymentController = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(createPaymentSchema, req.body);
+    const value = validateRequest<CreatePaymentInput>(createPaymentSchema, req.body);
     const payment = await paymentService.createPayment({ ...value, companyId: req.user.companyId });
     res.status(201).json({ success: true, data: payment });
   } catch (err) {

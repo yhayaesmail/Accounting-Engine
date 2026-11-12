@@ -3,14 +3,14 @@ import { AuthRequest } from "../../types/auth.types.js";
 import { BadRequestError } from "../../utils/errors.js";
 import { validateRequest } from "../../utils/validation.js";
 import * as customerService from "./customer.service.js";
-import { createCustomerSchema, updateCustomerSchema } from "./customer.validation.js";
+import { createCustomerSchema, updateCustomerSchema, type CreateCustomerInput, type UpdateCustomerInput } from "./customer.validation.js";
 
 export const createCustomerController = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(createCustomerSchema, req.body);
+    const value = validateRequest<CreateCustomerInput>(createCustomerSchema, req.body);
     const customer = await customerService.createCustomer({ ...value, companyId: req.user.companyId });
     res.status(201).json({ success: true, data: customer });
   } catch (err) {
@@ -47,7 +47,7 @@ export const updateCustomerController = async (req: AuthRequest, res: Response, 
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(updateCustomerSchema, req.body);
+    const value = validateRequest<UpdateCustomerInput>(updateCustomerSchema, req.body);
     const customer = await customerService.updateCustomer(req.params.id as string, req.user.companyId, value);
     res.status(200).json({ success: true, data: customer });
   } catch (err) {

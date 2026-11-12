@@ -3,14 +3,14 @@ import { AuthRequest } from "../../types/auth.types.js";
 import { BadRequestError } from "../../utils/errors.js";
 import { validateRequest } from "../../utils/validation.js";
 import * as accountService from "./account.service.js";
-import { createAccountSchema, updateAccountSchema } from "./account.validation.js";
+import { createAccountSchema, updateAccountSchema, type CreateAccountInput, type UpdateAccountInput } from "./account.validation.js";
 
 export const createAccountController = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(createAccountSchema, req.body);
+    const value = validateRequest<CreateAccountInput>(createAccountSchema, req.body);
     const account = await accountService.createAccount({ ...value, companyId: req.user.companyId });
     res.status(201).json({ success: true, data: account });
   } catch (err) {
@@ -47,7 +47,7 @@ export const updateAccountController = async (req: AuthRequest, res: Response, n
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(updateAccountSchema, req.body);
+    const value = validateRequest<UpdateAccountInput>(updateAccountSchema, req.body);
     const account = await accountService.updateAccount(req.params.id as string, req.user.companyId, value);
     res.status(200).json({ success: true, data: account });
   } catch (err) {

@@ -43,11 +43,28 @@ const SOFT_DELETE_ACTIONS = new Set([
  * defensive backstop. It is wrapped in a feature check because `$use` may not
  * be available in every Prisma/adapter configuration.
  */
-if (typeof prisma.$use === "function") {
-  prisma.$use(async (params, next) => {
+type MiddlewareParams = {
+  action: string;
+  model?: string;
+  args?: unknown;
+};
+
+// Prisma 7 driver adapters do not expose `$use`, so access the hook through a
+// structural cast; it only registers when the runtime client supports it.
+const clientWithMiddleware = prisma as unknown as {
+  $use?: (
+    callback: (
+      params: MiddlewareParams,
+      next: (params: MiddlewareParams) => Promise<unknown>
+    ) => void
+  ) => void;
+};
+
+if (typeof clientWithMiddleware.$use === "function") {
+  clientWithMiddleware.$use(async (params, next) => {
     if (
       SOFT_DELETE_ACTIONS.has(params.action) &&
-      SOFT_DELETE_MODELS.has(params.model) &&
+      SOFT_DELETE_MODELS.has(params.model ?? "") &&
       params.args &&
       typeof params.args === "object" &&
       "where" in params.args &&

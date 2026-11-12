@@ -9,5 +9,12 @@
     "strict": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "prisma.config.ts", "src/**/*.test.ts"]
+  "exclude": [
+    "node_modules",
+    "prisma.config.ts",
+    "src/**/*.test.ts",
+    "tests",
+    "vitest.config.ts",
+    "frontend"
+  ]
 }

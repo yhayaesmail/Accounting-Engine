@@ -2,7 +2,7 @@ import { Response, NextFunction } from "express";
 import { AuthRequest } from "../../types/auth.types.js";
 import { BadRequestError } from "../../utils/errors.js";
 import { validateRequest } from "../../utils/validation.js";
-import { createJournalSchema } from "./journal.validation.js";
+import { createJournalSchema, type CreateJournalEntryInput } from "./journal.validation.js";
 import * as journalService from "./journal.service.js";
 
 export const createJournalEntryController = async (
@@ -14,7 +14,7 @@ export const createJournalEntryController = async (
     if (!req.user?.userId || !req.user.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(createJournalSchema, req.body);
+    const value = validateRequest<CreateJournalEntryInput>(createJournalSchema, req.body);
     const entry = await journalService.createJournalEntry({
       ...value,
       userId: req.user.userId,

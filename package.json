@@ -8,6 +8,7 @@
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "npm run clean && prisma generate && tsc",
     "test": "vitest --run",
+    "test:unit": "vitest --run payment.Unit.test invoices.Unit.test journal.Unit.test",
     "start": "prisma migrate deploy && node ./dist/server.js",
     "start:local": "tsx ./src/server.ts",
     "seed": "tsx ./src/seed/seed.ts"

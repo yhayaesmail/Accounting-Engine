@@ -1,8 +1,25 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useApi } from "../hooks/useApi.ts";
 import { Button } from "../components/ui/Button.tsx";
 import { formatMoney } from "../lib/format.ts";
-import type { DashboardMetrics } from "../types/index.ts";
+import {
+  arAging,
+  monthlyInvoicedVsCollected,
+  topCustomers,
+  topExpenses,
+} from "../lib/analytics.ts";
+import {
+  ChartCard,
+  GroupedBarChart,
+  HBarChart,
+} from "../components/charts/Charts.tsx";
+import type {
+  DashboardMetrics,
+  Invoice,
+  Payment,
+  TrialBalance,
+} from "../types/index.ts";
 
 const STATS: { key: keyof DashboardMetrics; label: string; href: string }[] = [
   { key: "accounts", label: "Accounts", href: "/accounts" },
@@ -18,17 +35,39 @@ const FINANCIALS: { key: keyof DashboardMetrics; label: string }[] = [
   { key: "openBalance", label: "Open balance" },
 ];
 
-const QUICK_ACTIONS = [
-  { label: "New invoice", href: "/invoices", primary: true },
-  { label: "New journal entry", href: "/journal", primary: false },
-  { label: "New customer", href: "/customers", primary: false },
-  { label: "New vendor", href: "/vendors", primary: false },
-  { label: "New account", href: "/accounts", primary: false },
-];
-
 export default function Dashboard() {
-  const { data, loading, error, reload } =
-    useApi<DashboardMetrics>("/api/reports/dashboard");
+  const metrics = useApi<DashboardMetrics>("/api/reports/dashboard");
+  const invoices = useApi<Invoice[]>("/api/invoices");
+  const payments = useApi<Payment[]>("/api/payments");
+  const trial = useApi<TrialBalance>("/api/reports/trial-balance");
+
+  const { data, loading, error, reload } = metrics;
+
+  const months = useMemo(
+    () =>
+      invoices.data && payments.data
+        ? monthlyInvoicedVsCollected(invoices.data, payments.data)
+        : [],
+    [invoices.data, payments.data]
+  );
+  const aging = useMemo(
+    () =>
+      invoices.data && payments.data
+        ? arAging(invoices.data, payments.data)
+        : [],
+    [invoices.data, payments.data]
+  );
+  const expenses = useMemo(
+    () => (trial.data ? topExpenses(trial.data) : []),
+    [trial.data]
+  );
+  const customers = useMemo(
+    () => (invoices.data ? topCustomers(invoices.data) : []),
+    [invoices.data]
+  );
+
+  const openAr = aging.reduce((sum, bucket) => sum + bucket.amount, 0);
+  const chartsReady = Boolean(invoices.data && payments.data && trial.data);
 
   return (
     <div>
@@ -77,20 +116,54 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <section className="panel panel-pad">
-        <h2 className="section-title">Quick actions</h2>
-        <div className="quick-actions">
-          {QUICK_ACTIONS.map((action) => (
-            <Link
-              key={action.label}
-              to={action.href}
-              className={`btn ${action.primary ? "btn--primary" : ""}`}
-            >
-              {action.label}
-            </Link>
-          ))}
-        </div>
-      </section>
+      <div className="chart-grid">
+        <ChartCard
+          title="Invoiced vs collected"
+          subtitle="Cash collected against each invoice month · trailing 6 months"
+          wide
+          ready={chartsReady}
+          empty={months.length === 0 ? "No invoice activity yet." : undefined}
+          legend={[
+            { label: "Invoiced", tone: "navy" },
+            { label: "Collected", tone: "teal" },
+          ]}
+        >
+          <GroupedBarChart points={months} />
+        </ChartCard>
+
+        <ChartCard
+          title="Receivables aging"
+          subtitle={`${formatMoney(openAr)} outstanding · by invoice age`}
+          ready={chartsReady}
+          empty={openAr === 0 ? "Nothing outstanding — all settled." : undefined}
+        >
+          <HBarChart
+            rows={aging.map((bucket, index) => ({
+              label: bucket.label,
+              value: bucket.amount,
+              tone: index === 0 ? ("teal" as const) : undefined,
+            }))}
+          />
+        </ChartCard>
+
+        <ChartCard
+          title="Top customers"
+          subtitle="Invoiced value · all time"
+          ready={Boolean(invoices.data)}
+          empty={customers.length === 0 ? "No invoices yet." : undefined}
+        >
+          <HBarChart rows={customers} />
+        </ChartCard>
+
+        <ChartCard
+          title="Top expenses"
+          subtitle="Posted debits by account · all time"
+          ready={Boolean(trial.data)}
+          empty={expenses.length === 0 ? "No posted expenses yet." : undefined}
+        >
+          <HBarChart rows={expenses} />
+        </ChartCard>
+      </div>
     </div>
   );
 }

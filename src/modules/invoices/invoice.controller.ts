@@ -3,14 +3,14 @@ import { AuthRequest } from "../../types/auth.types.js";
 import { BadRequestError } from "../../utils/errors.js";
 import { validateRequest } from "../../utils/validation.js";
 import * as invoiceService from "./invoice.service.js";
-import { createInvoiceSchema, updateInvoiceSchema } from "./invoice.validation.js";
+import { createInvoiceSchema, updateInvoiceSchema, type CreateInvoiceInput, type UpdateInvoiceInput } from "./invoice.validation.js";
 
 export const createInvoiceController = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(createInvoiceSchema, req.body);
+    const value = validateRequest<CreateInvoiceInput>(createInvoiceSchema, req.body);
     const invoice = await invoiceService.createInvoice({ ...value, companyId: req.user.companyId });
     res.status(201).json({ success: true, data: invoice });
   } catch (err) {
@@ -47,7 +47,7 @@ export const updateInvoiceController = async (req: AuthRequest, res: Response, n
     if (!req.user?.companyId) {
       throw new BadRequestError("User company is required");
     }
-    const value = validateRequest(updateInvoiceSchema, req.body);
+    const value = validateRequest<UpdateInvoiceInput>(updateInvoiceSchema, req.body);
     const invoice = await invoiceService.updateInvoice(req.params.id as string, req.user.companyId, value);
     res.status(200).json({ success: true, data: invoice });
   } catch (err) {
