@@ -1,0 +1,1075 @@
+/* Accounting Engine — Design System */
+/* Light theme. White, deep navy, slate, plus one teal accent reserved for */
+/* settled/positive states (PAID, POSTED, received money). */
+/* No gradients, no glassmorphism, no decorative shadows, no fake data. */
+
+/* ─── Tokens ─── */
+:root {
+  /* Core colors */
+  --color-white: #ffffff;
+  --color-primary: #0b192c;   /* deep navy */
+  --color-accent: #0f766e;    /* settled / positive states only */
+  --color-accent-strong: #0b5f58;
+  --color-accent-soft: rgba(15, 118, 110, 0.08);
+  --color-secondary: #5b6b7c; /* slate gray */
+
+  /* Derived surfaces (tints of the palette, no new hues) */
+  --color-bg: #ffffff;
+  --color-surface: #f6f8fa;
+  --color-surface-hover: #eef2f6;
+  --color-surface-active: #e2e9f0;
+
+  /* Text */
+  --color-text-primary: #0b192c;
+  --color-text-secondary: #5b6b7c;
+  --color-text-muted: #8a97a6;
+  --color-text-inverse: #ffffff;
+
+  /* Borders */
+  --color-border: #dfe5eb;
+  --color-border-hover: #b8c4d0;
+  --color-border-focus: #0b192c;
+
+  /* Interactive */
+  --color-hover: #f0f4f8;
+  --color-active: #e3eaf1;
+  --color-disabled: #c9d2dc;
+  --color-disabled-text: #8a97a6;
+
+  --shadow-sm: 0 1px 2px rgba(11, 25, 44, 0.05);
+  --shadow-md: 0 2px 6px rgba(11, 25, 44, 0.07);
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  /* Sizing */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --border: 1px solid var(--color-border);
+  --input-height: 44px;
+  --button-height: 44px;
+  --sidebar-width: 248px;
+  --topbar-height: 56px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --transition: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition: 0ms;
+  }
+}
+
+/* ─── Reset ─── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--color-bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* ─── Utilities ─── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.w-full { width: 100%; }
+
+/* ─── Buttons ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--button-height);
+  padding: 0 var(--space-5);
+  font-size: 14px;
+  font-weight: 600;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background-color: var(--color-hover);
+  border-color: var(--color-border-hover);
+}
+
+.btn:active:not(:disabled) {
+  background-color: var(--color-active);
+}
+
+.btn:disabled {
+  background-color: var(--color-disabled);
+  border-color: var(--color-disabled);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background-color: #061019;
+  border-color: #061019;
+}
+
+.btn--ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+.btn--sm {
+  height: 34px;
+  padding: 0 var(--space-3);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn--icon {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  min-width: 38px;
+  border-color: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn--icon:hover:not(:disabled) {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+  border-color: transparent;
+}
+
+/* ─── Form fields ─── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-5);
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.01em;
+}
+
+.input {
+  width: 100%;
+  height: var(--input-height);
+  padding: 0 var(--space-4);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:hover {
+  border-color: var(--color-border-hover);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(11, 25, 44, 0.08);
+}
+
+.input:disabled {
+  background-color: var(--color-surface);
+  cursor: not-allowed;
+  color: var(--color-disabled-text);
+}
+
+.input--error {
+  border-color: var(--color-primary);
+}
+
+.field-helper {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.form-error {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  border: var(--border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ─── Badge ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: var(--border);
+  background-color: var(--color-bg);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ─── Table ─── */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  font-size: 13px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border);
+  background-color: var(--color-bg);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-4);
+  border-bottom: var(--border);
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background-color var(--transition);
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table .amount {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.table .code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10) var(--space-8);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ─── App layout ─── */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  border-right: var(--border);
+  /* Transparent so the solid bottom wave runs underneath, full-bleed.
+     The mobile slide-out (below) restores an opaque background. */
+  background-color: transparent;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand {
+  height: var(--topbar-height);
+  padding: 0 var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  border-bottom: var(--border);
+  letter-spacing: -0.01em;
+}
+
+.sidebar-nav {
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 9px var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-align: left;
+  width: 100%;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.sidebar-item:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+.sidebar-item--active {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: var(--space-3);
+  border-top: var(--border);
+}
+
+.topbar {
+  height: var(--topbar-height);
+  border-bottom: var(--border);
+  background-color: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  flex-shrink: 0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--space-6);
+  overflow-y: auto;
+  /* Transparent so the solid bottom wave shows through wherever the page
+     has no panels; panels themselves stay opaque white above it. */
+  background-color: transparent;
+}
+
+/* ─── Solid bottom wave ─── */
+/* Full-bleed (left: 0 → right: 0) solid teal wave anchored to the bottom of
+   the window, running underneath the transparent sidebar and content area.
+   z-index: -1 keeps it behind panels, text, and the sidebar; it shows through
+   wherever the page is empty. Solid fills only — no opacity washes. */
+.background-waves {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 180px;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.background-waves svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.background-waves .wave-back {
+  fill: var(--color-accent-strong);
+}
+
+.background-waves .wave-front {
+  fill: var(--color-accent);
+}
+
+@media print {
+  .background-waves {
+    display: none;
+  }
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.panel {
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+}
+
+.panel-pad {
+  padding: var(--space-5);
+}
+
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.mobile-menu-btn:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+/* ─── Dialog ─── */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(11, 25, 44, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+
+.dialog-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  background-color: var(--color-bg);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6);
+  transform: scale(0.98);
+  transition: transform var(--transition);
+  overflow-y: auto;
+}
+
+.dialog-overlay.open .dialog {
+  transform: scale(1);
+}
+
+.dialog-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: var(--space-5);
+}
+
+/* ─── Auth: form anchored to the left edge ─── */
+.auth-page {
+  display: flex;
+  height: 100vh;
+  background-color: var(--color-bg);
+  overflow: hidden;
+}
+
+.auth-left {
+  width: 40%;
+  flex-shrink: 0;
+  height: 100%;
+  background-color: var(--color-bg);
+  padding: var(--space-12) var(--space-12);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.auth-left-inner {
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-10);
+}
+
+.auth-brand svg {
+  width: 26px;
+  height: 26px;
+}
+
+.auth-title {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.auth-desc {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+  line-height: 1.55;
+}
+
+/* Larger controls inside the auth form */
+.auth-left-inner .field {
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.auth-left-inner .field-label {
+  font-size: 14px;
+}
+
+.auth-left-inner .input {
+  height: 52px;
+  font-size: 16px;
+  padding: 0 var(--space-4);
+}
+
+.auth-left-inner .input--with-trailing {
+  padding-right: 52px;
+}
+
+.auth-left-inner .btn {
+  height: 52px;
+  font-size: 16px;
+}
+
+.auth-left-inner .field-error {
+  font-size: 14px;
+}
+
+.auth-left-inner .form-error {
+  font-size: 15px;
+}
+
+.auth-switch {
+  margin-top: var(--space-6);
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.auth-switch a {
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.auth-right {
+  width: 60%;
+  flex-shrink: 0;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  padding: var(--space-12);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.auth-right-inner {
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.auth-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: var(--space-5);
+}
+
+.auth-right h2 {
+  font-size: 30px;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: var(--space-5);
+}
+
+.auth-right p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.auth-points {
+  list-style: none;
+  margin-top: var(--space-8);
+  max-width: 440px;
+}
+
+.auth-points li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  padding: var(--space-3) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.auth-points li:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.auth-points svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ─── Input with trailing control ─── */
+.input-wrap {
+  position: relative;
+  display: block;
+}
+
+.input--with-trailing {
+  padding-right: 48px;
+}
+
+.input-trailing {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.password-toggle:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+/* ─── Badge variants ─── */
+.badge--solid {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #ffffff;
+}
+
+/* ─── Data panel (table surface + states) ─── */
+.data-panel {
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  overflow: hidden;
+}
+
+.state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: 40px var(--space-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-top: var(--border);
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.table tfoot td {
+  padding: var(--space-4);
+  border-top: var(--border);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.money-accent {
+  color: var(--color-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Dashboard ─── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  color: inherit;
+  transition: border-color var(--transition);
+}
+
+.stat-card:hover {
+  border-color: var(--color-border-hover);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.financial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.financial-card {
+  padding: var(--space-5);
+}
+
+.financial-card--accent .financial-value {
+  color: var(--color-accent);
+}
+
+.financial-value {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-actions .btn {
+  justify-content: flex-start;
+}
+
+/* ─── Liquid page transition ─── */
+/* A navy sheet with wavy edges sweeps right → left over the auth screen,
+   the dashboard mounts underneath, then the sheet continues left to reveal it. */
+
+.transition-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+  transform: translateX(100%);
+  will-change: transform;
+  contain: layout paint;
+}
+
+.transition-sheet {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-primary);
+  will-change: transform;
+}
+
+.transition-wave {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 150px;
+  fill: var(--color-primary);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.transition-wave--left {
+  left: -140px;
+  transform-origin: right center;
+  animation: wave-breathe 1.6s ease-in-out infinite alternate;
+}
+
+.transition-wave--right {
+  right: -140px;
+  transform-origin: left center;
+  animation: wave-breathe 1.9s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes wave-breathe {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(1.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transition-wave {
+    animation: none;
+  }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .auth-right {
+    display: none;
+  }
+  .auth-left {
+    width: 100%;
+    padding: var(--space-8) var(--space-6);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+    z-index: 40;
+    box-shadow: var(--shadow-md);
+    background-color: var(--color-bg);
+  }
+  .mobile-menu-btn {
+    display: flex;
+  }
+  .main-content {
+    padding: var(--space-4);
+  }
+  .background-waves {
+    height: 120px;
+  }
+  .page-header {
+    flex-direction: column;
+    margin-bottom: var(--space-5);
+  }
+  .financial-grid {
+    grid-template-columns: 1fr;
+  }
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pagination-actions {
+    justify-content: flex-end;
+  }
+}
